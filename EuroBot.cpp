@@ -1,24 +1,36 @@
 #include <iostream>
 #include <fstream>
-#include <tgbot/tgbot.h>
-#include <nlohmann/json.hpp>
+#include <vector>
 
-using json = nlohmann::json;
+#include <tgbot/tgbot.h>
+
+#include "utils/utils.h"
+#include "utils/ConfigsReader/configs_reader.h"
 
 int main() {
-    std::ifstream ifs("configs/configs.json");
-    json configsJson = json::parse(ifs);
+    ConfigsReader::readJson("configs/configs.json");
+    TgBot::Bot bot(ConfigsReader::configs["tokenBot"]);
 
-    TgBot::Bot bot(configsJson["tokenBot"]);
+    TgBot::InlineKeyboardMarkup::Ptr startKeyBoard(new TgBot::InlineKeyboardMarkup); 
+    Utils::setKeyBoard(startKeyBoard, 
+    {
+        {"📖 Regolamento ", "regolamento"},
+        {"© Developer ", "crediti"}
+    }
+    );
+    Utils::setKeyBoard(startKeyBoard, {{"✅ Avvia", "avvia"}});
+    
+    bot.getEvents().onCommand("start", [&bot, &startKeyBoard](TgBot::Message::Ptr message) {
+        std::string userStatus = bot.getApi().getChatMember(message->chat->id, message->from->id)->status;
 
-    bot.getEvents().onCommand("start", [&bot, &configsJson](TgBot::Message::Ptr message) {
-        if(message->from->username == configsJson["nicknameOwner"]) {
-            bot.getApi().sendMessage(message->chat->id, "Hi!");
+        if(ConfigsReader::isAuthorizedRole(userStatus)) {
+            std::string welc = "\n\n👋 *Benvenuto/a @" + message->from->username + "*";
+            bot.getApi().sendMessage(
+                message->chat->id,
+                welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
+                false, 0, startKeyBoard, "MarkdownV2"
+                );       
         }
-    });
-
-    bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
-
     });
 
     try {

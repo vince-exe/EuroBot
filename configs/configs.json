@@ -1,4 +1,4 @@
 {
     "tokenBot": "YOU OWN TOKEN",
-    "nicknameOwner": "bScreen"
+    "authorizedRoles": ["creator"]
 }
