@@ -4,35 +4,16 @@
 
 #include <tgbot/tgbot.h>
 
+#include "commands/bot_commands.h"
 #include "utils/utils.h"
-#include "utils/ConfigsReader/configs_reader.h"
 
 int main() {
-    ConfigsReader::readJson("configs/configs.json");
-    TgBot::Bot bot(ConfigsReader::configs["tokenBot"]);
+    JsonObjs::configs.setPath("configs/configs.json");
+    TgBot::Bot bot(JsonObjs::configs.getJsonObj()["tokenBot"]);
 
-    TgBot::InlineKeyboardMarkup::Ptr startKeyBoard(new TgBot::InlineKeyboardMarkup); 
-    Utils::setKeyBoard(startKeyBoard, 
-    {
-        {"📖 Regolamento ", "regolamento"},
-        {"© Developer ", "crediti"}
-    }
-    );
-    Utils::setKeyBoard(startKeyBoard, {{"✅ Avvia", "avvia"}});
+    BotCommands botCommands(&bot);
+    botCommands.init();
     
-    bot.getEvents().onCommand("start", [&bot, &startKeyBoard](TgBot::Message::Ptr message) {
-        std::string userStatus = bot.getApi().getChatMember(message->chat->id, message->from->id)->status;
-
-        if(ConfigsReader::isAuthorizedRole(userStatus)) {
-            std::string welc = "\n\n👋 *Benvenuto/a @" + message->from->username + "*";
-            bot.getApi().sendMessage(
-                message->chat->id,
-                welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
-                false, 0, startKeyBoard, "MarkdownV2"
-                );       
-        }
-    });
-
     try {
         std::cout<<"\nBot " << bot.getApi().getMe()->username << " started"; 
         TgBot::TgLongPoll longPoll(bot);

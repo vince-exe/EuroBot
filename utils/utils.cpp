@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void Utils::setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr& keyboard, const std::vector<std::pair<std::string, std::string>> vec) {
+void Utils::setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::vector<std::pair<std::string, std::string>> vec) {
     std::vector<TgBot::InlineKeyboardButton::Ptr> row;
 
     for(auto it : vec) {
