@@ -12,13 +12,17 @@ private:
 
     TgBot::EventBroadcaster* eventBroadCaster;
 
-    TgBot::InlineKeyboardMarkup::Ptr startKeyBoard;
+    TgBot::InlineKeyboardMarkup::Ptr playKeyBoard;
+
+    TgBot::InlineKeyboardMarkup::Ptr backBoardCopyrights;
 
 private:
     void start();
+    
+    void play();
 
     void callBackQuery();
-    
+
 public:
     /**
      * @brief Construct a new Bot Commands object
@@ -41,8 +45,10 @@ public:
      * 
      * @return TgBot::InlineKeyboardMarkup::Ptr* 
      */
-    TgBot::InlineKeyboardMarkup::Ptr getStartKeyBoard();
 
+    TgBot::InlineKeyboardMarkup::Ptr getPlayKeyBoard();
+
+    TgBot::InlineKeyboardMarkup::Ptr getBackCopyRightsBoard();
 };
 
 #endif
