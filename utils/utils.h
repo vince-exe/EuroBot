@@ -16,7 +16,19 @@ namespace JsonObjs {
 }
 
 namespace Utils {
+    /**
+     * @brief Set the TgBot::InlineKeyboardMarkup::Ptr object
+     * 
+     * @param keyboard the keyboard to set
+     * @param vec a vector that contains all the buttons
+     */
     void setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::vector<std::pair<std::string, std::string>> vec);
+
+    /**
+     * @brief used to check if the user has typed the command: "start"
+     * 
+     */
+    static bool startCmdTyped = false;
 }
 
 #endif

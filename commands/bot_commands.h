@@ -16,10 +16,10 @@ private:
 
     TgBot::InlineKeyboardMarkup::Ptr backBoardCopyrights;
 
+    TgBot::InlineKeyboardMarkup::Ptr settingsBoard;
+    
 private:
     void start();
-    
-    void play();
 
     void callBackQuery();
 
@@ -44,11 +44,7 @@ public:
      * @brief Get the startKeyBoard property
      * 
      * @return TgBot::InlineKeyboardMarkup::Ptr* 
-     */
-
-    TgBot::InlineKeyboardMarkup::Ptr getPlayKeyBoard();
-
-    TgBot::InlineKeyboardMarkup::Ptr getBackCopyRightsBoard();
+    */
 };
 
 #endif

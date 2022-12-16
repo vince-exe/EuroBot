@@ -11,6 +11,9 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
     
     TgBot::InlineKeyboardMarkup::Ptr tempBack(new TgBot::InlineKeyboardMarkup);
     this->backBoardCopyrights = tempBack;
+
+    TgBot::InlineKeyboardMarkup::Ptr tempSettings(new TgBot::InlineKeyboardMarkup);
+    this->settingsBoard = tempSettings;
 }
 
 BotCommands::~BotCommands() {
@@ -25,72 +28,91 @@ void BotCommands::init() {
         {"© Developer ", "copyrights"}
     }
     );
+    Utils::setKeyBoard((this->playKeyBoard), {{"🔙 Back", "backToSettings"}});
     Utils::setKeyBoard((this->playKeyBoard), {{"✅ Avvia", "start"}});
     
     Utils::setKeyBoard((this->backBoardCopyrights), {{"🔙 Back", "backCopyRights"}});
 
+    Utils::setKeyBoard((this->settingsBoard),
+    {
+        {"🔧 Impostazioni", " settings"},
+        {"✅ Avvia", "startGame"}
+    }
+    );
+    
     this->start();
-    this->play();
     this->callBackQuery();
-}
-
-TgBot::InlineKeyboardMarkup::Ptr BotCommands::getPlayKeyBoard() {
-    return this->playKeyBoard;
-}
-
-TgBot::InlineKeyboardMarkup::Ptr BotCommands::getBackCopyRightsBoard() {
-    return this->backBoardCopyrights;
 }
 
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
-        std::string userStatus = this->bot->getApi().getChatMember(message->chat->id, message->from->id)->status;
+        Utils::startCmdTyped = true;
 
-        if(userStatus != "creator") { return; }
-
-        bot->getApi().sendMessage(message->chat->id, "questo è un messaggio!!");
-    });
-}
-
-void BotCommands::play() {
-    this->eventBroadCaster->onCommand("play", [this](TgBot::Message::Ptr message) {
         std::string userStatus = this->bot->getApi().getChatMember(message->chat->id, message->from->id)->status;
 
         if(userStatus != "creator") { return; }
         
-        std::string welc = "\n\n👋 *Pronto a giocare? " + message->from->username + "*";
-
-        this->bot->getApi().sendMessage(
+        std::string welc = "\n\n👋 *Benvenuto/a " + message->from->username + "*";
+        
+        bot->getApi().sendMessage(
             message->chat->id,
-            welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",    
-            false, 0, this->getPlayKeyBoard(), "MarkdownV2"
-        );       
+            welc + "\n\n🔧 *Impostazioni:* _Modifica le impostazioni della partita_\n\n✏️ *Nota:* _Le modifiche sono di base default_",
+            false, 0, this->settingsBoard, "Markdown"    
+        );
     });
 }
 
 void BotCommands::callBackQuery() {
     this->bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
-        if(query->data == "copyrights") {
-            this->bot->getApi().editMessageText(
-                "🧑‍💻 *Lista Sviluppatori*\n\n🥇 @bScreen *[* Programmer *]* \n\n🥈 @NonScopoMai *[* UI Designer *]*",
-                query->message->chat->id,
-                query->message->messageId,
-                "", "MarkdownV2", false, this->getBackCopyRightsBoard()
-            );
+
+        std::string userStatus = this->bot->getApi().getChatMember(query->message->chat->id, query->from->id)->status;
+        if(userStatus != "creator") { return; }
+        
+        try {
+            if(query->data == "startGame") {
+                std::string welc = "\n\n👋 *Pronto a giocare? " + query->message->from->username + "*";
+
+                this->bot->getApi().editMessageText(
+                    welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "Markdown", false, this->playKeyBoard
+                );
+            }
+
+            else if(query->data == "copyrights") {
+                this->bot->getApi().editMessageText(
+                    "🧑‍💻 *Lista Sviluppatori*\n\n🥇 @bScreen *Programmer* \n\n🥈 @NonScopoMai *UI Designer*",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "Markdown", false, this->backBoardCopyrights
+                );
+            }
+
+            else if(query->data == "backCopyRights") {
+                std::string welc = "\n\n👋 *Pronto a giocare? " + query->message->from->username + "*";
+
+                this->bot->getApi().editMessageText(
+                    welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "Markdown", false, this->playKeyBoard
+                );
+            }
+
+            else if(query->data == "backToSettings") {
+                std::string welc = "\n\n👋 *Benvenuto/a " + query->message->from->username + "*";
+
+                this->bot->getApi().editMessageText(
+                    welc + "\n\n🔧 *Impostazioni:* _Modifica le impostazioni della partita_\n\n✏️ *Nota:* _Le modifiche sono di base default_",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "Markdown", false, this->settingsBoard
+                );
+            }
         }
-        /* DOESN'T WORK
-        else if(query->data == "backCopyRights") {
-            std::string welc = "\n\n👋 *Pronto a giocare? " + query->message->from->username + "*";
-            this->bot->getApi().editMessageText(
-                welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
-                query->message->chat->id,
-                query->message->messageId,
-                "",
-                "",
-                false,
-                this->getPlayKeyBoard()
-            );
+        catch(std::exception& e) {
+            return;
         }
-        */
     });
 }
