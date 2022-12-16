@@ -2,13 +2,8 @@
 
 BotCommands::BotCommands(TgBot::Bot* bot) {
     this->bot = bot;
-
-    this->eventBroadCaster = new TgBot::EventBroadcaster;
     this->eventBroadCaster = &this->bot->getEvents();
-
-    TgBot::InlineKeyboardMarkup::Ptr tempPlay(new TgBot::InlineKeyboardMarkup); 
-    this->playKeyBoard = tempPlay;
-    
+   
     TgBot::InlineKeyboardMarkup::Ptr tempBack(new TgBot::InlineKeyboardMarkup);
     this->backBoardCopyrights = tempBack;
 
@@ -22,23 +17,16 @@ BotCommands::~BotCommands() {
 
 void BotCommands::init() {
 
-    Utils::setKeyBoard((this->playKeyBoard), 
-    {
-        {"📖 Regolamento ", "rules"},
-        {"© Developer ", "copyrights"}
-    }
-    );
-    Utils::setKeyBoard((this->playKeyBoard), {{"🔙 Back", "backToSettings"}});
-    Utils::setKeyBoard((this->playKeyBoard), {{"✅ Avvia", "start"}});
-    
-    Utils::setKeyBoard((this->backBoardCopyrights), {{"🔙 Back", "backCopyRights"}});
-
     Utils::setKeyBoard((this->settingsBoard),
     {
-        {"🔧 Impostazioni", " settings"},
-        {"✅ Avvia", "startGame"}
+        {"🔧 Impostazioni", " settings"}, 
+        {"© Developers", "copyrights"},
+        {"📖 Regolamento", "rules"}
     }
     );
+    Utils::setKeyBoard((this->settingsBoard), {{"✅ Avvia", "startGame"}});
+    
+    Utils::setKeyBoard((this->backBoardCopyrights), {{"🔙 Back", "backCopyRights"}});
     
     this->start();
     this->callBackQuery();
@@ -46,17 +34,14 @@ void BotCommands::init() {
 
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
-        Utils::startCmdTyped = true;
-
+    
         std::string userStatus = this->bot->getApi().getChatMember(message->chat->id, message->from->id)->status;
 
         if(userStatus != "creator") { return; }
         
-        std::string welc = "\n\n👋 *Benvenuto/a " + message->from->username + "*";
-        
         bot->getApi().sendMessage(
             message->chat->id,
-            welc + "\n\n🔧 *Impostazioni:* _Modifica le impostazioni della partita_\n\n✏️ *Nota:* _Le modifiche sono di base default_",
+            "*start message*",
             false, 0, this->settingsBoard, "Markdown"    
         );
     });
@@ -70,14 +55,7 @@ void BotCommands::callBackQuery() {
         
         try {
             if(query->data == "startGame") {
-                std::string welc = "\n\n👋 *Pronto a giocare? " + query->message->from->username + "*";
-
-                this->bot->getApi().editMessageText(
-                    welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
-                    query->message->chat->id,
-                    query->message->messageId,
-                    std::string(), "Markdown", false, this->playKeyBoard
-                );
+                ;
             }
 
             else if(query->data == "copyrights") {
@@ -90,21 +68,8 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "backCopyRights") {
-                std::string welc = "\n\n👋 *Pronto a giocare? " + query->message->from->username + "*";
-
                 this->bot->getApi().editMessageText(
-                    welc + "\n\n💰 _Scommetti & Vinci_ \n\n💬 Orientati con i pulsanti",
-                    query->message->chat->id,
-                    query->message->messageId,
-                    std::string(), "Markdown", false, this->playKeyBoard
-                );
-            }
-
-            else if(query->data == "backToSettings") {
-                std::string welc = "\n\n👋 *Benvenuto/a " + query->message->from->username + "*";
-
-                this->bot->getApi().editMessageText(
-                    welc + "\n\n🔧 *Impostazioni:* _Modifica le impostazioni della partita_\n\n✏️ *Nota:* _Le modifiche sono di base default_",
+                    "*start message*",
                     query->message->chat->id,
                     query->message->messageId,
                     std::string(), "Markdown", false, this->settingsBoard
