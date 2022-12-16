@@ -12,7 +12,7 @@ private:
 
     TgBot::EventBroadcaster* eventBroadCaster;
 
-    TgBot::InlineKeyboardMarkup::Ptr playKeyBoard;
+    TgBot::InlineKeyboardMarkup::Ptr startKeyBoard;
 
     TgBot::InlineKeyboardMarkup::Ptr backBoardCopyrights;
 
@@ -20,6 +20,8 @@ private:
     
 private:
     void start();
+
+    void settings();
 
     void callBackQuery();
 

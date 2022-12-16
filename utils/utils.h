@@ -23,6 +23,12 @@ namespace Utils {
      * @param vec a vector that contains all the buttons
      */
     void setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::vector<std::pair<std::string, std::string>> vec);
+
+    /**
+     * @brief used to check if the creator has access to the commands
+     * 
+     */
+    static bool hasAccess = false;
 }
 
 #endif
