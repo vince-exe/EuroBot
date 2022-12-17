@@ -12,6 +12,9 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
 
     TgBot::InlineKeyboardMarkup::Ptr tempSettings(new TgBot::InlineKeyboardMarkup);
     this->settingsBoard = tempSettings;
+
+    TgBot::InlineKeyboardMarkup::Ptr tempRules(new TgBot::InlineKeyboardMarkup);
+    this->backRules = tempRules;
 }
 
 BotCommands::~BotCommands() {
@@ -33,16 +36,16 @@ void BotCommands::init() {
 
     Utils::setKeyBoard((this->settingsBoard),
     {
-        {"🔧 Impostazioni", " settings"}, 
         {"© Sviluppatori", "copyrights"},
-        {"📖 Regolamento", "rules"}
+        {"📖 Termini & Condizioni", "ToS"}
     }
     );
-
-    Utils::setKeyBoard((this->settingsBoard), {{"✅ Avvia", "startGame"}});
+    Utils::setKeyBoard((this->settingsBoard), {{"🔧 Impostazioni", " settings"}});
 
     Utils::setKeyBoard((this->backBoardCopyrights), {{"🔙 Back", "backCopyRights"}});
     
+    Utils::setKeyBoard((this->backRules), {{"🔙 Back", "backRules"}});
+
     this->start();
     this->callBackQuery();
 }
@@ -61,9 +64,8 @@ void BotCommands::start() {
 
             return;
         }
-
         if(user->status != "creator") { return; }
-        Utils::hasAccess = true;
+        Utils::idCreator = user->user->id;
 
         this->bot->getApi().sendMessage(
             message->chat->id,
@@ -77,24 +79,47 @@ void BotCommands::callBackQuery() {
     this->bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(query->message->chat->id, query->from->id);
         
+        if(Utils::idCreator != user->user->id) { return; }
+        
         try {
             if(query->data == "update_here") {
-
+                this->bot->getApi().sendMessage(
+                    query->message->chat->id,
+                    "⚙️ <b>Pannello Configurazione</b>\n\n🛠️ <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot, configura il bot come meglio credi</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    false, 0, this->settingsBoard, "HTML"
+                );
             }
 
             else if(query->data == "update_private") {
                 this->bot->getApi().sendMessage(
-                user->user->id,
-                "ehyyyy",
-                false,
-                0
+                    user->user->id,
+                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    false, 0, this->settingsBoard, "HTML"
                 );
             }
 
+            else if(query->data == "backRules") {   
+                this->bot->getApi().editMessageText(
+                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "HTML", false, this->settingsBoard
+                );
+            }
+    
             else if(query->data == "startGame") {
                 ;
             }
 
+            else if(query->data == "ToS") {
+                this->bot->getApi().editMessageText(
+                    "<b>✏️ Termini & Condizioni </b>\n\n⛔ <i>É consigliato l'utilizzo di questo bot solo ad utenti maggiorenni</i>\n\n⚠️ <i>Il bot potrebbe causare dipendeza legata al gioco d'azzardo</i>\n\n⛑️ <i>Gli sviluppatori non sono responsabili di eventuali patologie legate all'utilizzo di questo bot</i>\n\n✅ Lo staff di @scommesse_bot ti augura buon divertimento :)",
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "HTML", false, this->backRules
+                );
+            }
+            
             else if(query->data == "copyrights") {
                 this->bot->getApi().editMessageText(
                     "🧑‍💻 *Lista Sviluppatori*\n\n🥇 @bScreen *Programmer* \n\n🥈 @NonScopoMai *UI Designer*",
@@ -106,10 +131,10 @@ void BotCommands::callBackQuery() {
 
             else if(query->data == "backCopyRights") {
                 this->bot->getApi().editMessageText(
-                    "*start message*",
+                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
                     query->message->chat->id,
                     query->message->messageId,
-                    std::string(), "Markdown", false, this->settingsBoard
+                    std::string(), "HTML", false, this->settingsBoard
                 );
             }
         }

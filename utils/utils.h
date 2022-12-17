@@ -28,7 +28,7 @@ namespace Utils {
      * @brief used to check if the creator has access to the commands
      * 
      */
-    static bool hasAccess = false;
+    static int idCreator = 0;
 }
 
 #endif

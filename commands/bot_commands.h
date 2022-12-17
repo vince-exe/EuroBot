@@ -18,6 +18,8 @@ private:
 
     TgBot::InlineKeyboardMarkup::Ptr settingsBoard;
     
+    TgBot::InlineKeyboardMarkup::Ptr backRules;
+    
 private:
     void start();
 
