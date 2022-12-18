@@ -1,15 +1,13 @@
 #include "json_reader.h"
 
-JsonReader::JsonReader(const std::string path) {
-    std::ifstream ifs(path);
-    this->jsonObj = json::parse(ifs);
-}
+json JsonReader::jsonObj;
 
 json JsonReader::getJsonObj() {
-    return this->jsonObj;
+    return JsonReader::jsonObj;
 }
 
-void JsonReader::setPath(const std::string path) {
-    std::ifstream ifs(path);
-    this->jsonObj = json::parse(ifs);
+void JsonReader::read(const std::string path) {
+    std::ifstream file(path);
+    JsonReader::jsonObj = json::parse(file);
+    file.close();
 }

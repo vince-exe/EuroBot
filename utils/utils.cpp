@@ -14,3 +14,7 @@ void Utils::setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::ve
 
     keyboard->inlineKeyboard.push_back(row);
 }
+
+std::string Utils::getEmoji(const std::string s, const std::string condition, const std::pair<std::string, std::string> emoji) {
+    return (s == condition ) ? emoji.first : emoji.second;
+}

@@ -5,13 +5,15 @@
 #include <iostream>
 
 #include "../utils/utils.h"
+#include "../utils/JsonReader/json_reader.h"
+#include "../utils/AdminSettings/admin_settings.h"
 
 class BotCommands {
 private:
     TgBot::Bot* bot;
 
     TgBot::EventBroadcaster* eventBroadCaster;
-
+        
     TgBot::InlineKeyboardMarkup::Ptr startKeyBoard;
 
     TgBot::InlineKeyboardMarkup::Ptr backBoardCopyrights;
@@ -19,11 +21,11 @@ private:
     TgBot::InlineKeyboardMarkup::Ptr settingsBoard;
     
     TgBot::InlineKeyboardMarkup::Ptr backRules;
-    
+
+    TgBot::InlineKeyboardMarkup::Ptr secondSettingsBoard;
+
 private:
     void start();
-
-    void settings();
 
     void callBackQuery();
 

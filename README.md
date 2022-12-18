@@ -1,4 +1,5 @@
 ### TO DO LIST
 
-### - when the bot gets invited, the user can chose if update the settings in the group or in private
+### - refactoring of the code, put the ridontant code in functions. Target: bot_commands.cpp Specific: onCallBackQuery()<br><br>
+### - refactoring of the code, put the strings on multiple lines. Target bot_commands.cpp Specific: onCallBackQuery()
  

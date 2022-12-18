@@ -15,6 +15,9 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
 
     TgBot::InlineKeyboardMarkup::Ptr tempRules(new TgBot::InlineKeyboardMarkup);
     this->backRules = tempRules;
+
+    TgBot::InlineKeyboardMarkup::Ptr tempSecondSettings(new TgBot::InlineKeyboardMarkup);
+    this->secondSettingsBoard = tempSecondSettings;
 }
 
 BotCommands::~BotCommands() {
@@ -40,11 +43,20 @@ void BotCommands::init() {
         {"📖 Termini & Condizioni", "ToS"}
     }
     );
-    Utils::setKeyBoard((this->settingsBoard), {{"🔧 Impostazioni", " settings"}});
+
+    Utils::setKeyBoard((this->settingsBoard), {{"🔧 Impostazioni", "settings"}});
 
     Utils::setKeyBoard((this->backBoardCopyrights), {{"🔙 Back", "backCopyRights"}});
     
     Utils::setKeyBoard((this->backRules), {{"🔙 Back", "backRules"}});
+
+    Utils::setKeyBoard((this->secondSettingsBoard), 
+    {
+        {"⚙️ Ripristina", "resetSettings"},
+        {"✅ Salva", "saveSettings"}
+    }
+    );
+    Utils::setKeyBoard((this->secondSettingsBoard), {{"🔙 Back", "backRules"}});
 
     this->start();
     this->callBackQuery();
@@ -64,6 +76,11 @@ void BotCommands::start() {
 
             return;
         }
+        std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
+        long long grouId = strtoll(groupIdStr.c_str(), NULL, 0);  
+
+        if(grouId != message->chat->id) { return; }
+
         if(user->status != "creator") { return; }
         Utils::idCreator = user->user->id;
 
@@ -85,7 +102,7 @@ void BotCommands::callBackQuery() {
             if(query->data == "update_here") {
                 this->bot->getApi().sendMessage(
                     query->message->chat->id,
-                    "⚙️ <b>Pannello Configurazione</b>\n\n🛠️ <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot, configura il bot come meglio credi</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    "⚙️ <b>Pannello Configurazione</b>\n\n🛠️ <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot, configura il bot come meglio credi</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✏️ Una volta configurato il bot vai al pannello di avvio e premi il pulsante  ✅Avvia\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
                     false, 0, this->settingsBoard, "HTML"
                 );
             }
@@ -93,14 +110,14 @@ void BotCommands::callBackQuery() {
             else if(query->data == "update_private") {
                 this->bot->getApi().sendMessage(
                     user->user->id,
-                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✏️ Una volta configurato il bot vai al pannello di avvio e premi il pulsante ✅Avvia\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
                     false, 0, this->settingsBoard, "HTML"
                 );
             }
 
             else if(query->data == "backRules") {   
                 this->bot->getApi().editMessageText(
-                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
+                    "🦺 <b>Pannello Configurazione</b>\n\n🔨 <i>Ciao @</i>" + user->user->username + " <i>benvenuto nel pannello di configurazione del bot</i>\n\n🛠️ <i>Configura il bot come meglio credi!!</i>\n\n⚠️ <i>Le impostazioni vengono ripristinate ogni volta che il bot viene stoppato</i>\n\n✏️ Una volta configurato il bot vai al pannello di avvio e premi il pulsante  ✅Avvia\n\n✅ <b>Un saluto dallo staff di @scommesse_bot</b>",
                     query->message->chat->id,
                     query->message->messageId,
                     std::string(), "HTML", false, this->settingsBoard
@@ -109,6 +126,28 @@ void BotCommands::callBackQuery() {
     
             else if(query->data == "startGame") {
                 ;
+            }
+
+            else if(query->data == "settings") {
+                this->bot->getApi().editMessageText(
+                    "👋🏻 Ciao <b> @" + user->user->username + "</b> \
+                    \n\n🛠️ <b>@scommesse_bot</b> <i>offre una vasta gamma di impostazioni, tutte da personalizzare</i>❗" \
+                    + "\n\n💰 <b>Soldi Iniziali</b>  " + AdminSettings::getValueByKey("startsMoney") \
+                    + "\n\n🎩 <b>Scommesse Giornaliere</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("dailyBets"), "-1", {"♾", "❌"}) \
+                    + "\n\n🎁 <b>Regalo Soldi</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("giveMoney"), "true", {"✅", "❌"}) \
+                    + "\n\n🥇 <b>Mostra Classifica</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("showClassification"), "true", {"✅", "❌"}) \
+                    + "\n\n📉 <b>Percentuale Vittoria</b>  " + AdminSettings::getValueByKey("winPercentage") + " 💸" \
+                    + "\n\n📈 <b>Percentuale Sconfitta</b>  " + AdminSettings::getValueByKey("losePercentage") + " 💸" \
+                    + "\n\n🪙 <b>Nome Valuta</b> " + AdminSettings::getValueByKey("coinName") \
+                    + "\n\n✏️  <i>Utilizza il comando /update \{impostazione\} \{valore\} per aggiornare un impostazione</i>" \
+                    + "\n\n⚙️ <b>Possibili Valori</b>" \
+                    + "\n\n♾ = <b>-1</b>" \
+                    + "\n\n✅ = <b>true</b>" \
+                    + "\n\n❌ = <b>false</b>", 
+                    query->message->chat->id,
+                    query->message->messageId,
+                    std::string(), "HTML", false, this->secondSettingsBoard
+                );
             }
 
             else if(query->data == "ToS") {

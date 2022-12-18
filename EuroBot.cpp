@@ -5,11 +5,14 @@
 #include <tgbot/tgbot.h>
 
 #include "commands/bot_commands.h"
-#include "utils/utils.h"
+#include "utils/JsonReader/json_reader.h"
+#include "utils/AdminSettings/admin_settings.h"
 
 int main() {
-    JsonObjs::configs.setPath("configs/configs.json");
-    TgBot::Bot bot(JsonObjs::configs.getJsonObj()["tokenBot"]);
+    JsonReader::read("configs/configs.json");
+    TgBot::Bot bot(JsonReader::getJsonObj()["tokenBot"]);
+
+    AdminSettings::init();
 
     BotCommands botCommands(&bot);
     botCommands.init();
