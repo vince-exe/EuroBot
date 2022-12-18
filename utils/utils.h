@@ -10,6 +10,24 @@
 #include <nlohmann/json.hpp>
 
 #include "./JsonReader/json_reader.h"
+#include "./AdminSettings/admin_settings.h"
+
+namespace CommandsUtils {
+    void printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate);
+
+    void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+    
+    void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    void printToS(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    void printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    void printStartPanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    void printStartPrivatePanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user);
+}
+
 
 namespace Utils {
     /**

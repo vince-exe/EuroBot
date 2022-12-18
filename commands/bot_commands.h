@@ -8,6 +8,7 @@
 #include "../utils/JsonReader/json_reader.h"
 #include "../utils/AdminSettings/admin_settings.h"
 
+
 class BotCommands {
 private:
     TgBot::Bot* bot;
@@ -16,13 +17,11 @@ private:
         
     TgBot::InlineKeyboardMarkup::Ptr startKeyBoard;
 
-    TgBot::InlineKeyboardMarkup::Ptr backBoardCopyrights;
-
-    TgBot::InlineKeyboardMarkup::Ptr settingsBoard;
-    
-    TgBot::InlineKeyboardMarkup::Ptr backRules;
+    TgBot::InlineKeyboardMarkup::Ptr backToStartPanel;
 
     TgBot::InlineKeyboardMarkup::Ptr secondSettingsBoard;
+
+    TgBot::InlineKeyboardMarkup::Ptr generalBoard;
 
 private:
     void start();
