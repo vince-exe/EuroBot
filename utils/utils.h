@@ -19,6 +19,8 @@ namespace CommandsUtils {
     
     void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
+    void editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+    
     void printToS(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
     void printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
@@ -26,6 +28,10 @@ namespace CommandsUtils {
     void printStartPanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
     void printStartPrivatePanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user);
+
+    int countArguments(const std::string command, const std::string message);
+    
+    std::vector<std::string> getArguments(const std::string command, const std::string message);
 }
 
 
@@ -44,6 +50,7 @@ namespace Utils {
     */
     static int idCreator = 0;
 
+    static bool updateCommandAuth = false;
     /**
      * @brief Return one of the two given emojis based on a condition
      * 

@@ -27,6 +27,8 @@ public:
     static int getLosePercentage();
 
     static std::string getCoinName();
+
+    static bool exist(const std::string key);
 };
 
 #endif

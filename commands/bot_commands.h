@@ -19,13 +19,17 @@ private:
 
     TgBot::InlineKeyboardMarkup::Ptr backToStartPanel;
 
-    TgBot::InlineKeyboardMarkup::Ptr secondSettingsBoard;
+    TgBot::InlineKeyboardMarkup::Ptr settingsBoard;
 
     TgBot::InlineKeyboardMarkup::Ptr generalBoard;
 
+    TgBot::InlineKeyboardMarkup::Ptr backToSettings;
+    
 private:
     void start();
-
+    
+    void update();
+    
     void callBackQuery();
 
 public:

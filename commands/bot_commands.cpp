@@ -4,17 +4,20 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
     this->bot = bot;
     this->eventBroadCaster = &this->bot->getEvents();
     
-    TgBot::InlineKeyboardMarkup::Ptr tmpStart(new TgBot::InlineKeyboardMarkup);
-    this->startKeyBoard = tmpStart;
+    TgBot::InlineKeyboardMarkup::Ptr startKeyBoard(new TgBot::InlineKeyboardMarkup);
+    this->startKeyBoard = startKeyBoard;
 
-    TgBot::InlineKeyboardMarkup::Ptr tmpGeneral(new TgBot::InlineKeyboardMarkup);
-    this->generalBoard = tmpGeneral;
+    TgBot::InlineKeyboardMarkup::Ptr generalBoard(new TgBot::InlineKeyboardMarkup);
+    this->generalBoard = generalBoard;
 
-    TgBot::InlineKeyboardMarkup::Ptr tmpSecond(new TgBot::InlineKeyboardMarkup);
-    this->secondSettingsBoard = tmpSecond;
+    TgBot::InlineKeyboardMarkup::Ptr settingsBoard(new TgBot::InlineKeyboardMarkup);
+    this->settingsBoard = settingsBoard;
 
-    TgBot::InlineKeyboardMarkup::Ptr tmpToStart(new TgBot::InlineKeyboardMarkup);
-    this->backToStartPanel = tmpToStart;
+    TgBot::InlineKeyboardMarkup::Ptr backToStartPanel(new TgBot::InlineKeyboardMarkup);
+    this->backToStartPanel = backToStartPanel;
+    
+    TgBot::InlineKeyboardMarkup::Ptr backToSettings(new TgBot::InlineKeyboardMarkup);
+    this->backToSettings = backToSettings;
 }
 
 BotCommands::~BotCommands() {
@@ -44,15 +47,23 @@ void BotCommands::init() {
 
     Utils::setKeyBoard((this->backToStartPanel), {{"🔙 Back", "backToStartPanel"}});
 
-    Utils::setKeyBoard((this->secondSettingsBoard), 
+    Utils::setKeyBoard((this->settingsBoard), 
     {
         {"⚙️ Ripristina", "resetSettings"},
         {"✅ Salva", "saveSettings"}
     }
     );
-    Utils::setKeyBoard((this->secondSettingsBoard), {{"🔙 Back", "backToStartPanel"}});
+    Utils::setKeyBoard((this->settingsBoard),
+    {
+        {"🔙 Back", "backToStartPanel"},
+        {"🆘 Help", "helpSettings"}
+    }
+    );
+
+    Utils::setKeyBoard((this->backToSettings), {{"🔙 Back", "backToSettings"}});
 
     this->start();
+    this->update();
     this->callBackQuery();
 }
 
@@ -72,9 +83,21 @@ void BotCommands::start() {
         if(grouId != message->chat->id) { return; }
 
         if(user->status != "creator") { return; }
+
         Utils::idCreator = user->user->id;
 
         CommandsUtils::printStartPanel(this->bot, message, user, this->startKeyBoard);
+    });
+}
+
+void BotCommands::update() {
+    this->eventBroadCaster->onCommand("update", [this](TgBot::Message::Ptr message) {
+        if(!Utils::updateCommandAuth || message->from->id != Utils::idCreator) { return; }
+
+        if(CommandsUtils::countArguments("/update", message->text) != 2) { return; }
+
+        std::vector<std::string> args = CommandsUtils::getArguments("/update", message->text);
+        if(AdminSettings::exist(args[0])) { std::cout<<"\nesiste"; }
     });
 }
 
@@ -98,7 +121,8 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "settings") {
-                CommandsUtils::printSettingsPanel(this->bot, query, this->secondSettingsBoard);
+                Utils::updateCommandAuth = true;
+                CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
             }
 
             else if(query->data == "ToS") {
@@ -109,8 +133,19 @@ void BotCommands::callBackQuery() {
                 CommandsUtils::printCopyRights(this->bot, query, this->backToStartPanel);
             }
 
+            else if(query->data == "helpSettings") {
+                Utils::updateCommandAuth = false;
+                CommandsUtils::editSettingsPanel(this->bot, query, this->backToSettings);
+            }
+
             else if(query->data == "backToStartPanel") {
+                Utils::updateCommandAuth = false;
                 CommandsUtils::editGeneralPanel(this->bot, query, user, this->generalBoard);
+            }
+
+            else if(query->data == "backToSettings") {
+                Utils::updateCommandAuth = true;
+                CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
             }
         }
 
