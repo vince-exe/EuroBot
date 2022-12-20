@@ -13,6 +13,14 @@ void CommandsUtils::printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr
     );
 }
 
+void CommandsUtils::printInvalidArguments(TgBot::Bot* bot, TgBot::Message::Ptr message) {
+    bot->getApi().sendMessage(
+        message->chat->id,
+        "❌ <b>Invalid Command</b> ❌",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
 void CommandsUtils::editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
     bot->getApi().editMessageText(
         "⚙️ <b>Pannello Generale</b>" \
@@ -29,7 +37,7 @@ void CommandsUtils::printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Pt
     bot->getApi().editMessageText(
         "⚙️ <b>Pannello Configurazione</b> \n\n🛠️ <b>@scommesse_bot</b> <i>offre una vasta gamma di impostazioni, tutte da personalizzare</i>❗" \
         "\n\n💰 <b>Soldi Iniziali</b>  " + AdminSettings::getValueByKey("SoldiIniziali") \
-        + "\n\n🎩 <b>Scommesse Giornaliere</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("ScommesseGiornaliere"), "-1", {"♾", "❌"}) \
+        + "\n\n🎩 <b>Scommesse Giornaliere</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("ScommesseGiornaliere"), "-1", {"♾", AdminSettings::getValueByKey("ScommesseGiornaliere")}) \
         + "\n\n🎁 <b>Regalo Soldi</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("RegaloSoldi"), "true", {"✅", "❌"}) \
         + "\n\n🥇 <b>Mostra Classifica</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("MostraClassifica"), "true", {"✅", "❌"}) \
         + "\n\n📉 <b>Percentuale Vittoria</b>  " + AdminSettings::getValueByKey("PercentualeVittoria") + " 💸" \
@@ -99,6 +107,51 @@ void CommandsUtils::printStartPrivatePanel(TgBot::Bot* bot, TgBot::Message::Ptr 
         \n\n⚠️  <i>Utilizza il comando /start nel gruppo dove hai invitato il bot per poter iniziare</i>",
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );    
+}
+
+bool CommandsUtils::isValid(const std::string command, const std::string message) {
+    if((command == "RegaloSoldi" || command == "MostraClassifica") && (message == "true" || message == "false")) { 
+        return true; 
+    }
+
+    if(command == "SoldiIniziali" || command == "ScommesseGiornaliere") {
+        try {
+            int number = std::stoi(message);
+
+            if(number == -1) { return true; }
+        
+            if(command == "ScommesseGiornaliere" && number <= 0) { return false; }
+            return true;
+        }
+        catch(std::invalid_argument const& ex) {
+            return false;
+        }
+        catch(std::out_of_range const& ex) {
+            return false;
+        }
+    }
+
+    if(command == "PercentualeVittoria" || command == "PercentualeSconfitta") {
+        try {
+            int money = std::stoi(message);
+
+            if(money < 0 || money > 100) { return false; }
+
+            return true;
+        }
+        catch(std::invalid_argument const& ex) {
+            return false;
+        }
+        catch(std::out_of_range const& ex) {
+            return false;
+        }
+    }
+
+    if(command == "NomeValuta" && command.length() <= CommandsUtils::maxCoinLen) { 
+        return true;
+    }
+
+    return false;
 }
 
 void Utils::setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::vector<std::pair<std::string, std::string>> vec) {

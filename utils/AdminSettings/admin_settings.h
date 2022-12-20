@@ -10,7 +10,11 @@ private:
 public:
     static void init();
 
-    static void setKeyValue(std::string key, std::string value);
+    static int size();
+
+    static void clear();
+    
+    static bool setKeyValue(std::string key, std::string value);
 
     static std::string getValueByKey(const std::string key);
     

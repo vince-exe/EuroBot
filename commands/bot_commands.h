@@ -24,7 +24,9 @@ private:
     TgBot::InlineKeyboardMarkup::Ptr generalBoard;
 
     TgBot::InlineKeyboardMarkup::Ptr backToSettings;
-    
+
+    TgBot::CallbackQuery::Ptr query;
+
 private:
     void start();
     

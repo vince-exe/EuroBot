@@ -11,12 +11,12 @@
 int main() {
     JsonReader::read("configs/configs.json");
     TgBot::Bot bot(JsonReader::getJsonObj()["tokenBot"]);
-
+        
     AdminSettings::init();
 
     BotCommands botCommands(&bot);
     botCommands.init();
-    
+
     try {
         std::cout<<"\nBot " << bot.getApi().getMe()->username << " started"; 
         TgBot::TgLongPoll longPoll(bot);

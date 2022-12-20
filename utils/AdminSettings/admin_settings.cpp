@@ -17,9 +17,21 @@ void AdminSettings::init() {
 
     AdminSettings::settingsList.insert({"NomeValuta", "coins"});
 }
-    
-void AdminSettings::setKeyValue(std::string key, std::string value) {
-    AdminSettings::settingsList.insert({key, value});
+
+int AdminSettings::size() {
+    return AdminSettings::settingsList.size();
+}    
+
+void AdminSettings::clear() {
+    AdminSettings::settingsList.clear();
+}
+
+bool AdminSettings::setKeyValue(std::string key, std::string value) {
+    auto it = AdminSettings::settingsList.find(key);
+    if(it == AdminSettings::settingsList.end()) { return false; }
+
+    it->second = value;
+    return true;
 }
 
 std::string AdminSettings::getValueByKey(const std::string key) {

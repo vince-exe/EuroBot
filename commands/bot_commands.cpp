@@ -70,7 +70,10 @@ void BotCommands::init() {
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(message->chat->id, message->from->id);
-        
+
+        if(AdminSettings::size() != 0) { AdminSettings::clear(); }
+        AdminSettings::init();
+
         /* if it's a private channel */
         if(message->chat->id == user->user->id) { 
             CommandsUtils::printStartPrivatePanel(this->bot, message, user);
@@ -89,22 +92,36 @@ void BotCommands::start() {
         CommandsUtils::printStartPanel(this->bot, message, user, this->startKeyBoard);
     });
 }
-
+    
 void BotCommands::update() {
     this->eventBroadCaster->onCommand("update", [this](TgBot::Message::Ptr message) {
         if(!Utils::updateCommandAuth || message->from->id != Utils::idCreator) { return; }
 
-        if(CommandsUtils::countArguments("/update", message->text) != 2) { return; }
-
+        if(CommandsUtils::countArguments("/update", message->text) != 2) { 
+            CommandsUtils::printInvalidArguments(this->bot, message);
+            return;
+        }
         std::vector<std::string> args = CommandsUtils::getArguments("/update", message->text);
-        if(AdminSettings::exist(args[0])) { std::cout<<"\nesiste"; }
+
+        if(!AdminSettings::exist(args[0]) || !CommandsUtils::isValid(args[0], args[1])) { 
+            CommandsUtils::printInvalidArguments(this->bot, message);
+            return;
+        }
+        
+        std::string tmp = AdminSettings::getValueByKey(args[0]);
+        AdminSettings::setKeyValue(args[0], args[1]);
+
+        if(tmp != AdminSettings::getValueByKey(args[0])) {
+            /* reprint the message */
+            CommandsUtils::printSettingsPanel(this->bot, this->query, this->settingsBoard); 
+        }
     });
 }
 
 void BotCommands::callBackQuery() {
     this->bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(query->message->chat->id, query->from->id);
-        
+        this->query = query;
         if(Utils::idCreator != user->user->id) { return; }
         
         try {

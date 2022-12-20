@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
-
+#include <stdexcept>
+#include <utility>
 #include <tgbot/tgbot.h>
 #include <nlohmann/json.hpp>
 
@@ -13,8 +14,12 @@
 #include "./AdminSettings/admin_settings.h"
 
 namespace CommandsUtils {
+    static int maxCoinLen = 10;
+    
     void printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate);
 
+    void printInvalidArguments(TgBot::Bot* bot, TgBot::Message::Ptr message);
+    
     void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
     
     void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
@@ -32,6 +37,8 @@ namespace CommandsUtils {
     int countArguments(const std::string command, const std::string message);
     
     std::vector<std::string> getArguments(const std::string command, const std::string message);
+
+    bool isValid(const std::string command, const std::string message);
 }
 
 
