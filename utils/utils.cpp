@@ -1,5 +1,15 @@
 #include "utils.h"
 
+void CommandsUtils::printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
+    bot->getApi().editMessageText(
+        "⚙️ <b>Pannello Conferma</b> \
+        \n\n🤖 <i>Sei sicuro di voler ripristinare le impostazioni?</i>",
+        query->message->chat->id,
+        query->message->messageId,
+        std::string(), "HTML", false, keyboard
+    );
+}
+
 void CommandsUtils::printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate) {
     int64_t id = (isPrivate) ? user->user->id : query->message->chat->id;
 

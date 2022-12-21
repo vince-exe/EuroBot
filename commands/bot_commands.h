@@ -25,6 +25,8 @@ private:
 
     TgBot::InlineKeyboardMarkup::Ptr backToSettings;
 
+    TgBot::InlineKeyboardMarkup::Ptr confirmBoard;
+
     TgBot::CallbackQuery::Ptr query;
 
 private:

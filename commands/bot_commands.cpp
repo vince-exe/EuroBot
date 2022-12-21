@@ -18,6 +18,9 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
     
     TgBot::InlineKeyboardMarkup::Ptr backToSettings(new TgBot::InlineKeyboardMarkup);
     this->backToSettings = backToSettings;
+
+    TgBot::InlineKeyboardMarkup::Ptr confirmBoard(new TgBot::InlineKeyboardMarkup);
+    this->confirmBoard = confirmBoard;
 }
 
 BotCommands::~BotCommands() {
@@ -47,12 +50,8 @@ void BotCommands::init() {
 
     Utils::setKeyBoard((this->backToStartPanel), {{"🔙 Back", "backToStartPanel"}});
 
-    Utils::setKeyBoard((this->settingsBoard), 
-    {
-        {"⚙️ Ripristina", "resetSettings"},
-        {"✅ Salva", "saveSettings"}
-    }
-    );
+    Utils::setKeyBoard((this->settingsBoard), {{"⚙️ Ripristina", "resetSettings"}});
+
     Utils::setKeyBoard((this->settingsBoard),
     {
         {"🔙 Back", "backToStartPanel"},
@@ -61,6 +60,13 @@ void BotCommands::init() {
     );
 
     Utils::setKeyBoard((this->backToSettings), {{"🔙 Back", "backToSettings"}});
+
+    Utils::setKeyBoard((this->confirmBoard), 
+    {
+        {"❌ Annulla", "deny"},
+        {"✅ Conferma", "confirm"}
+    }
+    );
 
     this->start();
     this->update();
@@ -122,6 +128,7 @@ void BotCommands::callBackQuery() {
     this->bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(query->message->chat->id, query->from->id);
         this->query = query;
+    
         if(Utils::idCreator != user->user->id) { return; }
         
         try {
@@ -140,6 +147,36 @@ void BotCommands::callBackQuery() {
             else if(query->data == "settings") {
                 Utils::updateCommandAuth = true;
                 CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
+            }
+
+            else if(query->data == "resetSettings") {
+                CommandsUtils::lastCommand.append("resetSettings");
+                Utils::updateCommandAuth = false;
+
+                CommandsUtils::printConfirmBoxReset(this->bot, query, this->confirmBoard);
+            }
+
+            else if(query->data == "deny") {
+                if(CommandsUtils::lastCommand == "resetSettings") {
+                    Utils::updateCommandAuth = true;
+                    CommandsUtils::lastCommand.clear();
+
+                    CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
+                    return;
+                }
+            }
+
+            else if(query->data == "confirm") {
+                if(CommandsUtils::lastCommand == "resetSettings") {
+                    Utils::updateCommandAuth = false;
+                    CommandsUtils::lastCommand.clear();
+
+                    AdminSettings::clear();
+                    AdminSettings::init();
+
+                    CommandsUtils::editGeneralPanel(this->bot, query, user, this->generalBoard);
+                    return;
+                }
             }
 
             else if(query->data == "ToS") {
