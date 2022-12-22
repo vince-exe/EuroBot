@@ -1,5 +1,43 @@
 #include "utils.h"
 
+int CommandsUtils::maxCoinLen = 10;
+
+int CommandsUtils::idCreator = 0;
+
+bool CommandsUtils::updateCommandAuth = false;
+
+bool CommandsUtils::startCommand = false;
+
+bool CommandsUtils::settingsButtonClicked = false;
+    
+std::string CommandsUtils::lastCommand;
+
+
+bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user) {
+    CommandsUtils::settingsButtonClicked = false;
+    CommandsUtils::startCommand = true;
+
+    if(AdminSettings::size() != 0) { AdminSettings::clear(); }
+    AdminSettings::init();
+
+    /* if it's a private channel */
+    if(id == user->user->id) { 
+        CommandsUtils::printStartPrivatePanel(bot, id, user);
+        return false;
+    }
+
+    std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
+    long long grouId = strtoll(groupIdStr.c_str(), NULL, 0);  
+
+    if(grouId != id) { return false; }
+
+    if(user->status != "creator") { return false; }
+
+    CommandsUtils::idCreator = user->user->id;
+
+    return true;
+}
+
 void CommandsUtils::printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
     bot->getApi().editMessageText(
         "⚙️ <b>Pannello Conferma</b> \
@@ -26,7 +64,8 @@ void CommandsUtils::printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr
 void CommandsUtils::printInvalidArguments(TgBot::Bot* bot, TgBot::Message::Ptr message) {
     bot->getApi().sendMessage(
         message->chat->id,
-        "❌ <b>Invalid Command</b> ❌",
+        "⚠️ <b>Comando Invalido</b> \
+        \n\n🤖 <i>Per favore inserisci impostazioni e valori esistenti</i>",
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );
 }
@@ -97,9 +136,9 @@ void CommandsUtils::printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr q
     );
 }
 
-void CommandsUtils::printStartPanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
+void CommandsUtils::printStartPanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
     bot->getApi().sendMessage(
-        message->chat->id,
+        id,
         "⚙️ <b>Pannello Avvio</b> \
         \n\n👋🏻 <i>Ciao @" + user->user->username + "</i> \
         \n\n🤖 <i>@scommesse_bot è il bot più utilizzato dagli utenti di questa piattaforma per divertirsi in compagnia!</i> \
@@ -108,9 +147,9 @@ void CommandsUtils::printStartPanel(TgBot::Bot* bot, TgBot::Message::Ptr message
     );     
 }
 
-void CommandsUtils::printStartPrivatePanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user) {
+void CommandsUtils::printStartPrivatePanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user) {
     bot->getApi().sendMessage(
-        message->chat->id,
+        id,
         "⚙️ <b>Pannello Avvio</b> \
         \n\n👋🏻 <i>Ciao @" + user->user->username + " </i> \
         \n\n🤖 <i>@scommesse_bot è il bot più utilizzato dagli utenti di questa piattaforma per divertirsi in compagnia!</i> \

@@ -13,37 +13,49 @@
 #include "./JsonReader/json_reader.h"
 #include "./AdminSettings/admin_settings.h"
 
-namespace CommandsUtils {
-    static int maxCoinLen = 10;
+class CommandsUtils {
+public:
+    static int maxCoinLen;
+
+    static int idCreator;
+
+    static bool updateCommandAuth;
+
+    static bool startCommand;
+
+    static bool settingsButtonClicked;
     
-    void printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-
-    void printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate);
-
-    void printInvalidArguments(TgBot::Bot* bot, TgBot::Message::Ptr message);
-    
-    void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-    
-    void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-
-    void editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-    
-    void printToS(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-
-    void printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-
-    void printStartPanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
-
-    void printStartPrivatePanel(TgBot::Bot* bot, TgBot::Message::Ptr message, TgBot::ChatMember::Ptr user);
-
-    int countArguments(const std::string command, const std::string message);
-    
-    std::vector<std::string> getArguments(const std::string command, const std::string message);
-
-    bool isValid(const std::string command, const std::string message);
-
     static std::string lastCommand;
-}
+
+public:
+    static bool startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
+
+    static void printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate);
+
+    static void printInvalidArguments(TgBot::Bot* bot, TgBot::Message::Ptr message);
+    
+    static void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+    
+    static void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+    
+    static void printToS(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void printStartPanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void printStartPrivatePanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
+
+    static int countArguments(const std::string command, const std::string message);
+    
+    static std::vector<std::string> getArguments(const std::string command, const std::string message);
+
+    static bool isValid(const std::string command, const std::string message);
+};
 
 
 namespace Utils {
@@ -59,9 +71,7 @@ namespace Utils {
      * @brief Check if the creator has access to the commands
      * 
     */
-    static int idCreator = 0;
 
-    static bool updateCommandAuth = false;
     /**
      * @brief Return one of the two given emojis based on a condition
      * 

@@ -76,32 +76,25 @@ void BotCommands::init() {
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(message->chat->id, message->from->id);
+        CommandsUtils::lastCommand = "start";
 
-        if(AdminSettings::size() != 0) { AdminSettings::clear(); }
-        AdminSettings::init();
-
-        /* if it's a private channel */
-        if(message->chat->id == user->user->id) { 
-            CommandsUtils::printStartPrivatePanel(this->bot, message, user);
+        if(CommandsUtils::startCommand) {
+            this->bot->getApi().sendMessage(
+                message->chat->id,
+                "<b>⛔ Hai ancora una sessione attiva, desideri chiuderla? </b>",
+                false, 0, this->confirmBoard, "HTML"
+            );
             return;
         }
-
-        std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
-        long long grouId = strtoll(groupIdStr.c_str(), NULL, 0);  
-
-        if(grouId != message->chat->id) { return; }
-
-        if(user->status != "creator") { return; }
-
-        Utils::idCreator = user->user->id;
-
-        CommandsUtils::printStartPanel(this->bot, message, user, this->startKeyBoard);
+        if(CommandsUtils::startBot(this->bot, message->chat->id, user)) {
+            CommandsUtils::printStartPanel(this->bot, message->chat->id, user, this->startKeyBoard);
+        };
     });
 }
     
 void BotCommands::update() {
     this->eventBroadCaster->onCommand("update", [this](TgBot::Message::Ptr message) {
-        if(!Utils::updateCommandAuth || message->from->id != Utils::idCreator) { return; }
+        if(!CommandsUtils::updateCommandAuth || message->from->id != CommandsUtils::idCreator) { return; }
 
         if(CommandsUtils::countArguments("/update", message->text) != 2) { 
             CommandsUtils::printInvalidArguments(this->bot, message);
@@ -128,15 +121,21 @@ void BotCommands::callBackQuery() {
     this->bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(query->message->chat->id, query->from->id);
         this->query = query;
-    
-        if(Utils::idCreator != user->user->id) { return; }
-        
-        try {
+
+        if(CommandsUtils::idCreator != user->user->id) { return; }
+
+        try {   
             if(query->data == "update_here") {
+                if(CommandsUtils::settingsButtonClicked) { return; }
+
+                CommandsUtils::settingsButtonClicked = true;
                 CommandsUtils::printGeneralPanel(this->bot, query, user, this->generalBoard, false);
             }
 
             else if(query->data == "update_private") {
+                if(CommandsUtils::settingsButtonClicked) { return; }
+
+                CommandsUtils::settingsButtonClicked = true;
                 CommandsUtils::printGeneralPanel(this->bot, query, user, this->generalBoard, true);
             }
 
@@ -145,37 +144,46 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "settings") {
-                Utils::updateCommandAuth = true;
+                CommandsUtils::updateCommandAuth = true;
                 CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
             }
 
             else if(query->data == "resetSettings") {
-                CommandsUtils::lastCommand.append("resetSettings");
-                Utils::updateCommandAuth = false;
+                CommandsUtils::lastCommand = "resetSettings";
+                CommandsUtils::updateCommandAuth = false;
 
                 CommandsUtils::printConfirmBoxReset(this->bot, query, this->confirmBoard);
             }
 
             else if(query->data == "deny") {
                 if(CommandsUtils::lastCommand == "resetSettings") {
-                    Utils::updateCommandAuth = true;
-                    CommandsUtils::lastCommand.clear();
+                    CommandsUtils::updateCommandAuth = true;
 
                     CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
                     return;
+                }
+
+                if(CommandsUtils::lastCommand == "start") {
+                    this->bot->getApi().deleteMessage(query->message->chat->id, query->message->messageId);
                 }
             }
 
             else if(query->data == "confirm") {
                 if(CommandsUtils::lastCommand == "resetSettings") {
-                    Utils::updateCommandAuth = false;
-                    CommandsUtils::lastCommand.clear();
+                    CommandsUtils::updateCommandAuth = false;
 
                     AdminSettings::clear();
                     AdminSettings::init();
 
                     CommandsUtils::editGeneralPanel(this->bot, query, user, this->generalBoard);
                     return;
+                }
+
+                if(CommandsUtils::lastCommand == "start") {
+                    this->bot->getApi().deleteMessage(query->message->chat->id, query->message->messageId);
+
+                    CommandsUtils::startBot(this->bot, query->message->chat->id, user);
+                    CommandsUtils::printStartPanel(this->bot, query->message->chat->id, user, this->startKeyBoard);
                 }
             }
 
@@ -188,17 +196,17 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "helpSettings") {
-                Utils::updateCommandAuth = false;
+                CommandsUtils::updateCommandAuth = false;
                 CommandsUtils::editSettingsPanel(this->bot, query, this->backToSettings);
             }
 
             else if(query->data == "backToStartPanel") {
-                Utils::updateCommandAuth = false;
+                CommandsUtils::updateCommandAuth = false;
                 CommandsUtils::editGeneralPanel(this->bot, query, user, this->generalBoard);
             }
 
             else if(query->data == "backToSettings") {
-                Utils::updateCommandAuth = true;
+                CommandsUtils::updateCommandAuth = true;
                 CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
             }
         }
