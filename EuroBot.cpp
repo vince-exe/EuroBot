@@ -8,6 +8,7 @@
 #include "utils/JsonReader/json_reader.h"
 #include "utils/AdminSettings/admin_settings.h"
 
+
 int main() {
     JsonReader::read("configs/configs.json");
     TgBot::Bot bot(JsonReader::getJsonObj()["tokenBot"]);
