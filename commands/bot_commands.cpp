@@ -70,6 +70,7 @@ void BotCommands::init() {
 
     this->start();
     this->update();
+    this->join();
     this->callBackQuery();
 }
 
@@ -112,9 +113,17 @@ void BotCommands::update() {
 
         if(tmp != AdminSettings::getValueByKey(args[0])) {
             /* reprint the message */
-            CommandsUtils::printSettingsPanel(this->bot, this->query, this->settingsBoard); 
+            CommandsUtils::printSettingsPanel(this->bot, {this->query->message->chat->id, this->query->message->messageId}, this->settingsBoard); 
         }
     });
+}
+
+void BotCommands::join() {
+    this->bot->getEvents().onCommand("join", [this](TgBot::Message::Ptr message) {
+        if(!CommandsUtils::gameStarted) { return; }
+
+        this->bot->getApi().sendMessage(message->chat->id, "user: " + message->from->username + " ora partecipa.\n\n( TEST )");
+    });     
 }
 
 void BotCommands::callBackQuery() {
@@ -139,13 +148,9 @@ void BotCommands::callBackQuery() {
                 CommandsUtils::printGeneralPanel(this->bot, query, user, this->generalBoard, true);
             }
 
-            else if(query->data == "startGame") {
-                ;
-            }
-
             else if(query->data == "settings") {
                 CommandsUtils::updateCommandAuth = true;
-                CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
+                CommandsUtils::printSettingsPanel(this->bot, {query->message->chat->id, query->message->messageId}, this->settingsBoard);
             }
 
             else if(query->data == "resetSettings") {
@@ -159,7 +164,7 @@ void BotCommands::callBackQuery() {
                 if(CommandsUtils::lastCommand == "resetSettings") {
                     CommandsUtils::updateCommandAuth = true;
 
-                    CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
+                    CommandsUtils::printSettingsPanel(this->bot, {query->message->chat->id, query->message->messageId}, this->settingsBoard);
                     return;
                 }
 
@@ -207,7 +212,14 @@ void BotCommands::callBackQuery() {
 
             else if(query->data == "backToSettings") {
                 CommandsUtils::updateCommandAuth = true;
-                CommandsUtils::printSettingsPanel(this->bot, query, this->settingsBoard);
+                CommandsUtils::printSettingsPanel(this->bot, {query->message->chat->id, query->message->messageId}, this->settingsBoard);
+            }
+
+            else if(query->data == "startGame") {
+                if(CommandsUtils::gameStarted) { return; }
+                CommandsUtils::gameStarted = true;
+
+                CommandsUtils::printAdminJoin(this->bot, query, user);
             }
         }
 

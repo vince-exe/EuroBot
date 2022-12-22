@@ -23,6 +23,10 @@ public:
 
     static bool updateCommandAuth;
 
+    static bool startCommandAuth;
+    
+    static bool gameStarted;
+
     static bool startCommand;
 
     static bool settingsButtonClicked;
@@ -32,6 +36,8 @@ public:
 public:
     static bool startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
 
+    static void printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user);
+
     static void printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
     static void printGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard, bool isPrivate);
@@ -40,7 +46,7 @@ public:
     
     static void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
     
-    static void printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+    static void printSettingsPanel(TgBot::Bot* bot, std::pair<int64_t, int32_t> ids, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
     static void editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
     

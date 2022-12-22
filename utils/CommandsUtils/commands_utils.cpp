@@ -6,10 +6,14 @@ int CommandsUtils::idCreator = 0;
 
 bool CommandsUtils::updateCommandAuth = false;
 
+bool CommandsUtils::startCommandAuth = false;
+
 bool CommandsUtils::startCommand = false;
 
 bool CommandsUtils::settingsButtonClicked = false;
-    
+
+bool CommandsUtils::gameStarted = false;
+
 std::string 
 
 CommandsUtils::lastCommand;
@@ -26,6 +30,7 @@ bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr
 
     CommandsUtils::startCommand = true;
     CommandsUtils::settingsButtonClicked = false;
+    CommandsUtils::gameStarted = false;
 
     std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
     long long grouId = strtoll(groupIdStr.c_str(), NULL, 0);  
@@ -37,6 +42,18 @@ bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr
     CommandsUtils::idCreator = user->user->id;
 
     return true;
+}
+
+void CommandsUtils::printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user) {
+    bot->getApi().editMessageText(
+        "<b>👋 Bentornato @" + user->user->username + "</b>\
+        \n\n<i>🤖 Il bot è stato avviato con successo.</i> \
+        \n\n<i>✏️ Un menu di impostazioni ti è stato inviato in privato </i>\
+        \n\n<i>⚠️ Se il messaggio non è arrivato, assicurati di non aver bloccato il bot</i>",
+        query->message->chat->id,
+        query->message->messageId,
+        std::string(), "HTML", false, std::make_shared<TgBot::GenericReply>()
+    );
 }
 
 void CommandsUtils::printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
@@ -83,7 +100,7 @@ void CommandsUtils::editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr 
     );
 }
 
-void CommandsUtils::printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
+void CommandsUtils::printSettingsPanel(TgBot::Bot* bot, std::pair<int64_t, int32_t> ids, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
     bot->getApi().editMessageText(
         "⚙️ <b>Pannello Configurazione</b> \n\n🛠️ <b>@scommesse_bot</b> <i>offre una vasta gamma di impostazioni, tutte da personalizzare</i>❗" \
         "\n\n💰 <b>Soldi Iniziali</b>  " + AdminSettings::getValueByKey("SoldiIniziali") \
@@ -94,8 +111,8 @@ void CommandsUtils::printSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Pt
         + "\n\n📈 <b>Percentuale Sconfitta</b>  " + AdminSettings::getValueByKey("PercentualeSconfitta") + " 💸" \
         + "\n\n🪙 <b>Nome Valuta</b> " + AdminSettings::getValueByKey("NomeValuta") \
         + "\n\n✏️  <i>Premi il pulsante</i> <b>/help</b> <i>per maggiori informazioni.</i>",
-        query->message->chat->id,
-        query->message->messageId,
+        ids.first,
+        ids.second,
         std::string(), "HTML", false, keyboard
     );
 }
