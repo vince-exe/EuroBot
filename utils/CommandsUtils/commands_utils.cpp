@@ -14,9 +14,14 @@ bool CommandsUtils::settingsButtonClicked = false;
 
 bool CommandsUtils::gameStarted = false;
 
-std::string 
+std::string CommandsUtils::lastCommand;
 
-CommandsUtils::lastCommand;
+bool CommandsUtils::isValidGroup(int64_t id) {
+    std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
+    long long grouId = strtoll(groupIdStr.c_str(), NULL, 0); 
+
+    return (id == grouId) ? true : false;
+}
 
 bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user) {
     if(AdminSettings::size() != 0) { AdminSettings::clear(); }
@@ -25,20 +30,15 @@ bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr
     /* if it's a private channel */
     if(id == user->user->id) { 
         CommandsUtils::printStartPrivatePanel(bot, id, user);
+
         return false;
     }
+    
+    if(!CommandsUtils::isValidGroup(id) || user->status != "creator") { return false; }
 
     CommandsUtils::startCommand = true;
     CommandsUtils::settingsButtonClicked = false;
     CommandsUtils::gameStarted = false;
-
-    std::string groupIdStr = JsonReader::getJsonObj()["groupId"];
-    long long grouId = strtoll(groupIdStr.c_str(), NULL, 0);  
-
-    if(grouId != id) { return false; }
-
-    if(user->status != "creator") { return false; }
-
     CommandsUtils::idCreator = user->user->id;
 
     return true;

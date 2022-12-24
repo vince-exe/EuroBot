@@ -5,9 +5,12 @@
 #include <iostream>
 
 #include "../utils/utils.h"
+#include "../database/database.h"
 #include "../utils/CommandsUtils/commands_utils.h"
 #include "../utils/JsonReader/json_reader.h"
 #include "../utils/AdminSettings/admin_settings.h"
+
+#include "../user/user.h"
 
 
 class BotCommands {
@@ -29,6 +32,9 @@ private:
     TgBot::InlineKeyboardMarkup::Ptr confirmBoard;
 
     TgBot::CallbackQuery::Ptr query;
+
+public:
+    DBErrors::SqlErrors sqlErrs;
 
 private:
     void start();

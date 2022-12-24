@@ -11,12 +11,17 @@
 #include <mysql-cppconn-8/jdbc/cppconn/prepared_statement.h>
 #include <mysql-cppconn-8/jdbc/mysql_connection.h>
 
+#include "../user/user.h"
 
 namespace DBErrors {
     struct SqlErrors {
         std::string what;
+
         int errCode;
+
         std::string sqlState;
+
+        bool error;
     };
 }
 
@@ -47,7 +52,15 @@ private:
 
     static sql::ResultSet *res;
 
+    static sql::PreparedStatement *pstmt;
+
 public:
+    /**
+     * @brief property of type DBErrors::SqlErrors used to check if an error occurred
+     * 
+     */
+    static DBErrors::SqlErrors sqlErrs;
+    
     /**
      * @brief connect to the hostname using user and password
      *
@@ -69,7 +82,31 @@ public:
      */
     static void destroy();
 
-    static bool existUser(const std::string id);
+    /**
+     * @brief checks if a user exist in the database
+     * 
+     * @param id user identifier for the exist condition
+     * 
+     * @param sqlErr a struct used when an error is present
+     * 
+     * @return true if the user is in the database
+     * 
+     * @return false if the user isn't in the database
+     */
+    static bool existUser(User::user* user, DBErrors::SqlErrors* sqlErr);
+
+    /**
+     * @brief insert a user in the database
+     * 
+     * @param user the user to insert
+     * 
+     * @param sqlErr a struct used when an error is present
+     * 
+     * @return true if the insertion went fine
+     * 
+     * @return false if the insertion went not fine
+     */
+    static bool insertUser(User::user* user, DBErrors::SqlErrors* sqlErr);
 };
 
 #endif

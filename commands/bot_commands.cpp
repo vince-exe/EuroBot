@@ -77,9 +77,12 @@ void BotCommands::init() {
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(message->chat->id, message->from->id);
-        CommandsUtils::lastCommand = "start";
 
+        CommandsUtils::lastCommand = "start";
+        
         if(CommandsUtils::startCommand) {
+            if(!CommandsUtils::isValidGroup(message->chat->id)) { return; }
+
             this->bot->getApi().sendMessage(
                 message->chat->id,
                 "<b>⛔ Hai ancora una sessione attiva, desideri chiuderla? </b>",
@@ -122,7 +125,19 @@ void BotCommands::join() {
     this->bot->getEvents().onCommand("join", [this](TgBot::Message::Ptr message) {
         if(!CommandsUtils::gameStarted) { return; }
 
-        this->bot->getApi().sendMessage(message->chat->id, "user: " + message->from->username + " ora partecipa.\n\n( TEST )");
+        User::user user{message->from->username, message->from->id};
+
+        if(!Database::existUser(&user, &Database::sqlErrs)) {
+            if(Database::sqlErrs.error) {
+                /* error */
+                return;
+            }
+            if(!Database::insertUser(&user, &Database::sqlErrs)) {
+                /* error */
+                return;
+            }
+            std::cout<<"\nragazzo aggiunto correttamente al database!!";
+        }
     });     
 }
 
@@ -148,12 +163,12 @@ void BotCommands::callBackQuery() {
                 CommandsUtils::printGeneralPanel(this->bot, query, user, this->generalBoard, true);
             }
 
-            else if(query->data == "settings") {
+            else if(query->data == "settings" && !CommandsUtils::gameStarted) {
                 CommandsUtils::updateCommandAuth = true;
                 CommandsUtils::printSettingsPanel(this->bot, {query->message->chat->id, query->message->messageId}, this->settingsBoard);
             }
 
-            else if(query->data == "resetSettings") {
+            else if(query->data == "resetSettings" && !CommandsUtils::gameStarted) {
                 CommandsUtils::lastCommand = "resetSettings";
                 CommandsUtils::updateCommandAuth = false;
 
@@ -161,7 +176,7 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "deny") {
-                if(CommandsUtils::lastCommand == "resetSettings") {
+                if(CommandsUtils::lastCommand == "resetSettings" && !CommandsUtils::gameStarted) {
                     CommandsUtils::updateCommandAuth = true;
 
                     CommandsUtils::printSettingsPanel(this->bot, {query->message->chat->id, query->message->messageId}, this->settingsBoard);
@@ -174,7 +189,7 @@ void BotCommands::callBackQuery() {
             }
 
             else if(query->data == "confirm") {
-                if(CommandsUtils::lastCommand == "resetSettings") {
+                if(CommandsUtils::lastCommand == "resetSettings" && !CommandsUtils::gameStarted) {
                     CommandsUtils::updateCommandAuth = false;
 
                     AdminSettings::clear();
@@ -187,8 +202,9 @@ void BotCommands::callBackQuery() {
                 if(CommandsUtils::lastCommand == "start") {
                     this->bot->getApi().deleteMessage(query->message->chat->id, query->message->messageId);
 
-                    CommandsUtils::startBot(this->bot, query->message->chat->id, user);
-                    CommandsUtils::printStartPanel(this->bot, query->message->chat->id, user, this->startKeyBoard);
+                    if(CommandsUtils::startBot(this->bot, query->message->chat->id, user)) {
+                        CommandsUtils::printStartPanel(this->bot, query->message->chat->id, user, this->startKeyBoard);
+                    }
                 }
             }
 
@@ -200,7 +216,7 @@ void BotCommands::callBackQuery() {
                 CommandsUtils::printCopyRights(this->bot, query, this->backToStartPanel);
             }
 
-            else if(query->data == "helpSettings") {
+            else if(query->data == "helpSettings" && !CommandsUtils::gameStarted) {
                 CommandsUtils::updateCommandAuth = false;
                 CommandsUtils::editSettingsPanel(this->bot, query, this->backToSettings);
             }
@@ -217,7 +233,7 @@ void BotCommands::callBackQuery() {
 
             else if(query->data == "startGame") {
                 if(CommandsUtils::gameStarted) { return; }
-                CommandsUtils::gameStarted = true;
+                CommandsUtils::gameStarted = true; 
 
                 CommandsUtils::printAdminJoin(this->bot, query, user);
             }

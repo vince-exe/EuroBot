@@ -32,8 +32,10 @@ public:
     static bool settingsButtonClicked;
     
     static std::string lastCommand;
-
+    
 public:
+    static bool isValidGroup(int64_t id);
+
     static bool startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
 
     static void printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user);

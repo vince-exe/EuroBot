@@ -2,6 +2,7 @@
 #define ADMIN_SETTINGS_H
 
 #include <unordered_map>
+#include <string>
 
 class AdminSettings {
 private:
