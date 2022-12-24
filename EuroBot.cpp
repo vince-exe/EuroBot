@@ -5,12 +5,18 @@
 #include <tgbot/tgbot.h>
 
 #include "commands/bot_commands.h"
+#include "database/database.h"
 #include "utils/JsonReader/json_reader.h"
 #include "utils/AdminSettings/admin_settings.h"
 
 
 int main() {
     JsonReader::read("configs/configs.json");
+
+    if(!DBUtils::startDatabase(JsonReader::getJsonObj()["hostNameDB"], JsonReader::getJsonObj()["user"], JsonReader::getJsonObj()["password"], JsonReader::getJsonObj()["schemaDB"])) {
+        return EXIT_FAILURE;
+    };    
+
     TgBot::Bot bot(JsonReader::getJsonObj()["tokenBot"]);
         
     AdminSettings::init();
@@ -19,7 +25,7 @@ int main() {
     botCommands.init();
 
     try {
-        std::cout<<"\nBot " << bot.getApi().getMe()->username << " started"; 
+        std::cout<<"\n\nBot " << bot.getApi().getMe()->username << " started"; 
         TgBot::TgLongPoll longPoll(bot);
 
         while (true) {
@@ -31,5 +37,5 @@ int main() {
         std::cout<<"\nerror: " << e.what();
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

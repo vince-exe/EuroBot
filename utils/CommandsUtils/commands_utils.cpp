@@ -104,9 +104,9 @@ void CommandsUtils::printSettingsPanel(TgBot::Bot* bot, std::pair<int64_t, int32
     bot->getApi().editMessageText(
         "⚙️ <b>Pannello Configurazione</b> \n\n🛠️ <b>@scommesse_bot</b> <i>offre una vasta gamma di impostazioni, tutte da personalizzare</i>❗" \
         "\n\n💰 <b>Soldi Iniziali</b>  " + AdminSettings::getValueByKey("SoldiIniziali") \
-        + "\n\n🎩 <b>Scommesse Giornaliere</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("ScommesseGiornaliere"), "-1", {"♾", AdminSettings::getValueByKey("ScommesseGiornaliere")}) \
-        + "\n\n🎁 <b>Regalo Soldi</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("RegaloSoldi"), "true", {"✅", "❌"}) \
-        + "\n\n🥇 <b>Mostra Classifica</b>  " + Utils::getEmoji(AdminSettings::getValueByKey("MostraClassifica"), "true", {"✅", "❌"}) \
+        + "\n\n🎩 <b>Scommesse Giornaliere</b>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("ScommesseGiornaliere"), "-1", {"♾", AdminSettings::getValueByKey("ScommesseGiornaliere")}) \
+        + "\n\n🎁 <b>Regalo Soldi</b>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("RegaloSoldi"), "true", {"✅", "❌"}) \
+        + "\n\n🥇 <b>Mostra Classifica</b>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("MostraClassifica"), "true", {"✅", "❌"}) \
         + "\n\n📉 <b>Percentuale Vittoria</b>  " + AdminSettings::getValueByKey("PercentualeVittoria") + " 💸" \
         + "\n\n📈 <b>Percentuale Sconfitta</b>  " + AdminSettings::getValueByKey("PercentualeSconfitta") + " 💸" \
         + "\n\n🪙 <b>Nome Valuta</b> " + AdminSettings::getValueByKey("NomeValuta") \

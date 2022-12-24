@@ -10,7 +10,7 @@
 #include <tgbot/tgbot.h>
 
 
-namespace Utils {
+namespace BotUtils {
     /**
      * @brief Set the TgBot::InlineKeyboardMarkup::Ptr object
      * 

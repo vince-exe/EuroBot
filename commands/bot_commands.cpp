@@ -28,40 +28,40 @@ BotCommands::~BotCommands() {
 }
 
 void BotCommands::init() {
-    Utils::setKeyBoard((this->startKeyBoard),
+    BotUtils::setKeyBoard((this->startKeyBoard),
     {
         {"🔑 Configura Qui", "update_here"},
         {"🔐 Configura In Privato", "update_private"}
     }
     );
-    Utils::setKeyBoard((this->startKeyBoard),
+    BotUtils::setKeyBoard((this->startKeyBoard),
     {
         {"✅ Avvia", "startGame"}
     }
     );
 
-    Utils::setKeyBoard((this->generalBoard),
+    BotUtils::setKeyBoard((this->generalBoard),
     {
         {"© Sviluppatori", "copyrights"},
         {"📖 Termini & Condizioni", "ToS"}
     }
     );
-    Utils::setKeyBoard((this->generalBoard), {{"🔧 Impostazioni", "settings"}});
+    BotUtils::setKeyBoard((this->generalBoard), {{"🔧 Impostazioni", "settings"}});
 
-    Utils::setKeyBoard((this->backToStartPanel), {{"🔙 Back", "backToStartPanel"}});
+    BotUtils::setKeyBoard((this->backToStartPanel), {{"🔙 Back", "backToStartPanel"}});
 
-    Utils::setKeyBoard((this->settingsBoard), {{"⚙️ Ripristina", "resetSettings"}});
+    BotUtils::setKeyBoard((this->settingsBoard), {{"⚙️ Ripristina", "resetSettings"}});
 
-    Utils::setKeyBoard((this->settingsBoard),
+    BotUtils::setKeyBoard((this->settingsBoard),
     {
         {"🔙 Back", "backToStartPanel"},
         {"🆘 Help", "helpSettings"}
     }
     );
 
-    Utils::setKeyBoard((this->backToSettings), {{"🔙 Back", "backToSettings"}});
+    BotUtils::setKeyBoard((this->backToSettings), {{"🔙 Back", "backToSettings"}});
 
-    Utils::setKeyBoard((this->confirmBoard), 
+    BotUtils::setKeyBoard((this->confirmBoard), 
     {
         {"❌ Annulla", "deny"},
         {"✅ Conferma", "confirm"}
