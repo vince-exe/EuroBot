@@ -40,6 +40,14 @@ namespace BotUtils {
      * 
      */
     std::string getEmoji(const std::string s, const std::string condition, const std::pair<std::string, std::string> emoji);
+
+    class Bot {
+    private:
+        static std::unordered_map<int64_t, bool> usersJoined;
+
+    public:
+        static void insert(std::pair<int64_t, bool> pair);
+    };
 }
 
 #endif

@@ -136,9 +136,17 @@ void BotCommands::join() {
                 /* error */
                 return;
             }
-            std::cout<<"\nragazzo aggiunto correttamente al database!!";
+            
         }
     });     
+}
+
+void BotCommands::userMenu() {
+    this->bot->getEvents().onCommand("myMenu", [this](TgBot::Message::Ptr message) {
+        if(!CommandsUtils::gameStarted) {
+            return;
+        }
+    });
 }
 
 void BotCommands::callBackQuery() {

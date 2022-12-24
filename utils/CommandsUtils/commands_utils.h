@@ -26,7 +26,7 @@ public:
     static bool startCommandAuth;
     
     static bool gameStarted;
-
+    
     static bool startCommand;
 
     static bool settingsButtonClicked;

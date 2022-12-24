@@ -2,6 +2,7 @@
 #define BOT_COMMANDS_H
 
 #include <tgbot/tgbot.h>
+#include <unordered_map>
 #include <iostream>
 
 #include "../utils/utils.h"
@@ -43,6 +44,8 @@ private:
     
     void join();
     
+    void userMenu();
+
     void callBackQuery();
 
 public:
