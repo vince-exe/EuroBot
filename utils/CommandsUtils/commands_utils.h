@@ -36,7 +36,11 @@ public:
 public:
     static bool isValidGroup(int64_t id);
 
+    static void fatalError(TgBot::Bot* bot, int64_t id);
+
     static bool startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
+
+    static void printGameSettings(TgBot::Bot* bot, int64_t chatId);
 
     static void printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user);
 

@@ -19,3 +19,17 @@ void BotUtils::setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std:
 std::string BotUtils::getEmoji(const std::string s, const std::string condition, const std::pair<std::string, std::string> emoji) {
     return (s == condition ) ? emoji.first : emoji.second;
 }
+
+std::vector<int64_t> JoinedUsers::idVec;
+
+void JoinedUsers::insert(int64_t id) {
+    JoinedUsers::idVec.push_back(id);
+}
+
+bool JoinedUsers::isIn(int64_t id) {
+    for(auto& id_ : JoinedUsers::idVec) {
+        if(id_ == id) { return true; } 
+    }
+
+    return false;
+}

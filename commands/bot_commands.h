@@ -44,7 +44,7 @@ private:
     
     void join();
     
-    void userMenu();
+    void infoGame();
 
     void callBackQuery();
 

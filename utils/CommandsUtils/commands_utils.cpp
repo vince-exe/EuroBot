@@ -23,6 +23,17 @@ bool CommandsUtils::isValidGroup(int64_t id) {
     return (id == grouId) ? true : false;
 }
 
+void CommandsUtils::fatalError(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id,
+        "⛔ <b>System Error</b> \
+        \n\n🤖 <i>Mi dispiace ho dovuto interrompere la partita per un errore di sistema.</i> \
+        \n\n⚙️ <i>Il servizio riprenderà quando i tecnici avranno trovato una soluzione</i> \
+        \n\n⛑️ <i>Cordiali saluti dallo staff di @scommesse_bot</i>",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
 bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user) {
     if(AdminSettings::size() != 0) { AdminSettings::clear(); }
     AdminSettings::init();
@@ -46,10 +57,11 @@ bool CommandsUtils::startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr
 
 void CommandsUtils::printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user) {
     bot->getApi().editMessageText(
-        "<b>👋 Bentornato @" + user->user->username + "</b>\
+        "<b>👋 Ciao @" + user->user->username + "</b>\
         \n\n<i>🤖 Il bot è stato avviato con successo.</i> \
         \n\n<i>✏️ Un menu di impostazioni ti è stato inviato in privato </i>\
-        \n\n<i>⚠️ Se il messaggio non è arrivato, assicurati di non aver bloccato il bot</i>",
+        \n\n<i>⚠️ Se il messaggio non è arrivato, assicurati di non aver bloccato il bot</i> \
+        \n\n<i>✅ Utilizza il comando /join per entrare nella partita</i>",
         query->message->chat->id,
         query->message->messageId,
         std::string(), "HTML", false, std::make_shared<TgBot::GenericReply>()
@@ -63,6 +75,22 @@ void CommandsUtils::printConfirmBoxReset(TgBot::Bot* bot, TgBot::CallbackQuery::
         query->message->chat->id,
         query->message->messageId,
         std::string(), "HTML", false, keyboard
+    );
+}
+
+void CommandsUtils::printGameSettings(TgBot::Bot* bot, int64_t chatId) {
+    bot->getApi().sendMessage(
+        chatId,
+        "🤖 <b>Impostazioni Partita</b> " \
+        "\n\n<i>✏️ Non sarà possibile cambiare queste impostazioni fino alla prossima partita.</i>"
+        "\n\n💰 <i>Soldi Iniziali</i>  " + AdminSettings::getValueByKey("SoldiIniziali") \
+        + "\n\n🎩 <i>Scommesse Giornaliere</i>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("ScommesseGiornaliere"), "-1", {"♾", AdminSettings::getValueByKey("ScommesseGiornaliere")}) \
+        + "\n\n🎁 <i>Regalo Soldi</i>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("RegaloSoldi"), "true", {"✅", "❌"}) \
+        + "\n\n🥇 <i>Mostra Classifica</i>  " + BotUtils::getEmoji(AdminSettings::getValueByKey("MostraClassifica"), "true", {"✅", "❌"}) \
+        + "\n\n📉 <i>Percentuale Vittoria</i>  " + AdminSettings::getValueByKey("PercentualeVittoria") + " 💸" \
+        + "\n\n📈 <i>Percentuale Sconfitta</i>  " + AdminSettings::getValueByKey("PercentualeSconfitta") + " 💸" \
+        + "\n\n🪙 <i>Nome Valuta</i> " + AdminSettings::getValueByKey("NomeValuta"),
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );
 }
 

@@ -71,6 +71,7 @@ void BotCommands::init() {
     this->start();
     this->update();
     this->join();
+    this->infoGame();
     this->callBackQuery();
 }
 
@@ -128,24 +129,28 @@ void BotCommands::join() {
         User::user user{message->from->username, message->from->id};
 
         if(!Database::existUser(&user, &Database::sqlErrs)) {
-            if(Database::sqlErrs.error) {
-                /* error */
-                return;
+            if(Database::sqlErrs.error || !Database::insertUser(&user, &Database::sqlErrs)) {
+                CommandsUtils::fatalError(this->bot, message->chat->id);
+                exit(EXIT_FAILURE);
             }
-            if(!Database::insertUser(&user, &Database::sqlErrs)) {
-                /* error */
-                return;
-            }
-            
         }
+        this->bot->getApi().sendMessage(
+            message->chat->id,
+            "🤖 <b>Nuovo Utente </b> \
+            \n\n⭐ <i>@" + message->from->username + " si è unito alla partita</i>",
+            false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+        );
+        
+        JoinedUsers::insert(user.id);
     });     
 }
 
-void BotCommands::userMenu() {
-    this->bot->getEvents().onCommand("myMenu", [this](TgBot::Message::Ptr message) {
-        if(!CommandsUtils::gameStarted) {
+void BotCommands::infoGame() {
+    this->bot->getEvents().onCommand("infoGame", [this](TgBot::Message::Ptr message) {
+        if(!CommandsUtils::gameStarted || !JoinedUsers::isIn(message->from->id)) {
             return;
         }
+        CommandsUtils::printGameSettings(this->bot, message->from->id);
     });
 }
 

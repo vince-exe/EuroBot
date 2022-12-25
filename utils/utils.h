@@ -20,16 +20,6 @@ namespace BotUtils {
     void setKeyBoard(TgBot::InlineKeyboardMarkup::Ptr keyboard, const std::vector<std::pair<std::string, std::string>> vec);
 
     /**
-     * @brief Check if the creator has access to the commands
-     * 
-    */
-
-   /**
-    * @brief generate a unique identifier
-    * 
-    */
-
-    /**
      * @brief Return one of the two given emojis based on a condition
      * 
      * @param s a string where the condition should appear
@@ -40,14 +30,16 @@ namespace BotUtils {
      * 
      */
     std::string getEmoji(const std::string s, const std::string condition, const std::pair<std::string, std::string> emoji);
-
-    class Bot {
-    private:
-        static std::unordered_map<int64_t, bool> usersJoined;
-
-    public:
-        static void insert(std::pair<int64_t, bool> pair);
-    };
 }
+
+class JoinedUsers {
+    private:
+        static std::vector<int64_t> idVec;
+
+    public: 
+        static void insert(int64_t id);
+
+        static bool isIn(int64_t id);
+};
 
 #endif
