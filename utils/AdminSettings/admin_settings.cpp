@@ -38,8 +38,8 @@ std::string AdminSettings::getValueByKey(const std::string key) {
     return AdminSettings::settingsList[key];
 }
 
-double AdminSettings::getMoney() {
-    return std::stod(AdminSettings::settingsList["SoldiIniziali"]);
+int AdminSettings::getMoney() {
+    return std::atoi(AdminSettings::settingsList["SoldiIniziali"].c_str());
 }
 
 int AdminSettings::dailyBets() {

@@ -45,6 +45,8 @@ private:
     void join();
     
     void infoGame();
+    
+    void stake();
 
     void callBackQuery();
 
@@ -64,12 +66,6 @@ public:
      * 
      */
     void init();
-
-    /**
-     * @brief Get the startKeyBoard property
-     * 
-     * @return TgBot::InlineKeyboardMarkup::Ptr* 
-    */
 };
 
 #endif

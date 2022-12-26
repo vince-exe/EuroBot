@@ -20,16 +20,16 @@ std::string BotUtils::getEmoji(const std::string s, const std::string condition,
     return (s == condition ) ? emoji.first : emoji.second;
 }
 
-std::vector<int64_t> JoinedUsers::idVec;
+int BotUtils::getRandom(int min, int max) {
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist6(min, max); 
 
-void JoinedUsers::insert(int64_t id) {
-    JoinedUsers::idVec.push_back(id);
+    return  dist6(rng);
 }
 
-bool JoinedUsers::isIn(int64_t id) {
-    for(auto& id_ : JoinedUsers::idVec) {
-        if(id_ == id) { return true; } 
-    }
-
-    return false;
+void BotUtils::printFatalErrorDB(DBErrors::SqlErrors* sqlErr) {
+    std::cout<<"\nERROR: " << sqlErr->what;
+    std::cout<<"\nSTATUS: " << sqlErr->sqlState;
+    std::cout<<"\nERR-CODE: " << sqlErr->errCode;
 }

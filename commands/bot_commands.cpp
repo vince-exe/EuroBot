@@ -72,6 +72,7 @@ void BotCommands::init() {
     this->update();
     this->join();
     this->infoGame();
+    this->stake();
     this->callBackQuery();
 }
 
@@ -126,31 +127,74 @@ void BotCommands::join() {
     this->bot->getEvents().onCommand("join", [this](TgBot::Message::Ptr message) {
         if(!CommandsUtils::gameStarted) { return; }
 
-        User::user user{message->from->username, message->from->id};
+        User user(message->from->id, message->from->username, AdminSettings::getMoney());
+        DBErrors::SqlErrors sqlErr;
 
-        if(!Database::existUser(&user, &Database::sqlErrs)) {
-            if(Database::sqlErrs.error || !Database::insertUser(&user, &Database::sqlErrs)) {
+        if(!Database::existUser(&user, &sqlErr)) {
+            if(sqlErr.error || !Database::insertUser(&user, &sqlErr)) {
                 CommandsUtils::fatalError(this->bot, message->chat->id);
+                BotUtils::printFatalErrorDB(&sqlErr);
+
                 exit(EXIT_FAILURE);
             }
         }
-        this->bot->getApi().sendMessage(
-            message->chat->id,
-            "🤖 <b>Nuovo Utente </b> \
-            \n\n⭐ <i>@" + message->from->username + " si è unito alla partita</i>",
-            false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
-        );
+        if(!UserManager::exist(message->from->id)) {
+            this->bot->getApi().sendMessage(
+                message->chat->id,
+                "🤖 <b>Nuovo Utente </b> \
+                \n\n⭐ <i>@" + message->from->username + " si è unito alla partita</i>",
+                false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+            );
         
-        JoinedUsers::insert(user.id);
+            UserManager::push(message->from->id);
+        }
     });     
 }
 
 void BotCommands::infoGame() {
     this->bot->getEvents().onCommand("infoGame", [this](TgBot::Message::Ptr message) {
-        if(!CommandsUtils::gameStarted || !JoinedUsers::isIn(message->from->id)) {
+        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id)) {
             return;
         }
-        CommandsUtils::printGameSettings(this->bot, message->from->id);
+        CommandsUtils::printGameSettings(this->bot, message->chat->id);
+    });
+}
+
+void BotCommands::stake() {
+    this->bot->getEvents().onCommand("punta", [this](TgBot::Message::Ptr message) {
+        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || CommandsUtils::countArguments("/punta", message->text) != 1) {
+            return;
+        }
+        int value;
+        if(!CommandsUtils::toInt(&value, CommandsUtils::getArguments("/punta", message->text)[0])) {
+            return;
+        }
+        DBErrors::SqlErrors sqlErr;
+        User user = Database::getUser(message->from->id, &sqlErr);
+        
+        if(user.getId() == -1) {
+            CommandsUtils::fatalError(this->bot, message->chat->id);
+            BotUtils::printFatalErrorDB(&sqlErr);
+                
+            exit(EXIT_FAILURE);
+        }
+        
+        if(value > user.getCoins()) {
+            return;
+        }
+
+        if(BotUtils::getRandom(0, 1)) {
+            int win = (value * AdminSettings::getWinPercentage()) / 100;
+            user.addCoins(win);
+
+            CommandsUtils::printWinBet(this->bot, message->chat->id, win, &user);
+        }
+        else {
+            int lose = (value * AdminSettings::getLosePercentage()) / 100;
+            user.remCoins(lose);
+
+            CommandsUtils::printLoseBet(this->bot, message->chat->id, lose,&user);
+        }
     });
 }
 

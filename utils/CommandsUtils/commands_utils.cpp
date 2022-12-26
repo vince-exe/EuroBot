@@ -23,6 +23,46 @@ bool CommandsUtils::isValidGroup(int64_t id) {
     return (id == grouId) ? true : false;
 }
 
+bool CommandsUtils::toInt(int* a, const std::string s) {
+    try {
+        *a = std::stoi(s);
+
+        return true;
+    }
+    catch(std::invalid_argument const& ex) {
+            return false;
+        }
+    catch(std::out_of_range const& ex) {
+            return false;
+        }
+}
+
+void CommandsUtils::printWinBet(TgBot::Bot* bot, int64_t id, int win, User* user) {
+    std::string win_ = std::to_string(win);
+    std::string money = std::to_string(user->getCoins());
+
+    bot->getApi().sendMessage(
+        id,
+        "🤖 <b>Scommessa Effettuata</b> \
+        \n\n✅ @" + user->getUsername() + " <i>ha vinto " + win_ + "</i> \
+        \n\n💰 <b>Saldo Attuale</b>: " + money,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::printLoseBet(TgBot::Bot* bot, int64_t id, int lose, User* user) {
+    std::string lose_ = std::to_string(lose);
+    std::string money = std::to_string(user->getCoins());
+
+    bot->getApi().sendMessage(
+        id,
+        "🤖 <b>Scommessa Effettuata</b> \
+        \n\n❌ @" + user->getUsername() + " <i>ha perso " + lose_ + "</i> \
+        \n\n💰 <b>Saldo Attuale</b>: " + money,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
 void CommandsUtils::fatalError(TgBot::Bot* bot, int64_t id) {
     bot->getApi().sendMessage(
         id,

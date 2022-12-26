@@ -8,6 +8,9 @@
 #include <stdexcept>
 #include <utility>
 #include <tgbot/tgbot.h>
+#include <random>
+
+#include "../database/database.h"
 
 
 namespace BotUtils {
@@ -30,16 +33,23 @@ namespace BotUtils {
      * 
      */
     std::string getEmoji(const std::string s, const std::string condition, const std::pair<std::string, std::string> emoji);
+
+    /**
+     * @brief generate a random number between ( min; max )
+     * 
+     * @param min min generation value
+     * @param max max generation value
+     * 
+     * @return a random value between ( min; max )
+     */
+    int getRandom(int min, int max);
+
+    /**
+     * @brief print the database fatal error message in the terminal
+     * 
+     * @param sqlErr the DBErros::SqlErros* pointer to struct for database errors
+     */
+    void printFatalErrorDB(DBErrors::SqlErrors* sqlErr);
 }
-
-class JoinedUsers {
-    private:
-        static std::vector<int64_t> idVec;
-
-    public: 
-        static void insert(int64_t id);
-
-        static bool isIn(int64_t id);
-};
 
 #endif

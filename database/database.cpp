@@ -10,15 +10,15 @@ sql::ResultSet* Database::res;
 
 sql::PreparedStatement* Database::pstmt;
 
-DBErrors::SqlErrors Database::sqlErrs;
-
 bool DBUtils::startDatabase(const std::string hostname, const std::string user, const std::string password, const std::string schema) {
-    if(!Database::connect(hostname, user, password, schema, &Database::sqlErrs)) {
+    DBErrors::SqlErrors sqlErr;
+
+    if(!Database::connect(hostname, user, password, schema, &sqlErr)) {
         std::cout<<"\nError while attempting to connect..\n";
 
-        std::cout<<"\n# ERR: " << Database::sqlErrs.what;
-        std::cout<<"\n# ERROR CODE: " << Database::sqlErrs.errCode;
-        std::cout<<"\n# SQL STATE: " << Database::sqlErrs.sqlState;
+        std::cout<<"\n# ERR: " << sqlErr.what;
+        std::cout<<"\n# ERROR CODE: " << sqlErr.errCode;
+        std::cout<<"\n# SQL STATE: " <<sqlErr.sqlState;
 
         return false;
     }
@@ -56,13 +56,13 @@ void Database::destroy() {
     delete Database::stmt;
 }
 
-bool Database::existUser(User::user* user, DBErrors::SqlErrors* sqlErr) {
+bool Database::existUser(User* user, DBErrors::SqlErrors* sqlErr) {
     try {
         sqlErr->error = false;
         Database::pstmt = Database::con->prepareStatement(
             "SELECT ID FROM users WHERE users.ID = ?;"
         );  
-        Database::pstmt->setString(1, std::to_string(user->id));
+        Database::pstmt->setString(1, std::to_string(user->getId()));
         Database::res = Database::pstmt->executeQuery();
 
         return (Database::res->rowsCount()) ? true : false;
@@ -75,14 +75,15 @@ bool Database::existUser(User::user* user, DBErrors::SqlErrors* sqlErr) {
     }  
 }
 
-bool Database::insertUser(User::user* user, DBErrors::SqlErrors* sqlErr) {
+bool Database::insertUser(User* user, DBErrors::SqlErrors* sqlErr) {
     try {
         sqlErr->error = false;
         Database::pstmt = Database::con->prepareStatement(
-            "INSERT INTO users (ID, username) VALUES (?, ?);"
+            "INSERT INTO users (ID, username, coins) VALUES (?, ?, ?);"
         );
-        Database::pstmt->setString(1, std::to_string(user->id));
-        Database::pstmt->setString(2, user->username);
+        Database::pstmt->setString(1, std::to_string(user->getId()));
+        Database::pstmt->setString(2, user->getUsername());
+        Database::pstmt->setInt(3, user->getCoins());
 
         Database::pstmt->executeUpdate();
 
@@ -95,5 +96,29 @@ bool Database::insertUser(User::user* user, DBErrors::SqlErrors* sqlErr) {
         sqlErr->error = true;
 
         return false;
+    }
+}
+
+User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
+    try {
+        sqlErr->error = false;
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT * FROM users WHERE users.ID = ?;"
+        );
+        Database::pstmt->setString(1, std::to_string(id));
+        Database::res = Database::pstmt->executeQuery();
+
+        if(res->next()) {
+            return User(strtoll(res->getString("ID").c_str(), NULL, 0), res->getString("username"), res->getInt(3));
+        }
+        return User();
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+
+        sqlErr->error = true;
+        return User();
     }
 }

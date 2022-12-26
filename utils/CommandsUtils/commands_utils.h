@@ -36,9 +36,15 @@ public:
 public:
     static bool isValidGroup(int64_t id);
 
+    static bool toInt(int* a, const std::string s);
+
     static void fatalError(TgBot::Bot* bot, int64_t id);
 
     static bool startBot(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
+
+    static void printWinBet(TgBot::Bot* bot, int64_t id, int win, User* user);
+
+    static void printLoseBet(TgBot::Bot* bot, int64_t id, int lose, User* user);
 
     static void printGameSettings(TgBot::Bot* bot, int64_t chatId);
 

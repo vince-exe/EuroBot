@@ -19,7 +19,7 @@ public:
 
     static std::string getValueByKey(const std::string key);
     
-    static double getMoney();
+    static int getMoney();
 
     static int dailyBets();
 
