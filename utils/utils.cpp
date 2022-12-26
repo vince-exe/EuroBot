@@ -33,3 +33,14 @@ void BotUtils::printFatalErrorDB(DBErrors::SqlErrors* sqlErr) {
     std::cout<<"\nSTATUS: " << sqlErr->sqlState;
     std::cout<<"\nERR-CODE: " << sqlErr->errCode;
 }
+
+const std::string BotUtils::currentDateTime(const std::string& format) {
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
+    tstruct = *localtime(&now);
+
+    strftime(buf, sizeof(buf), format.c_str(), &tstruct);
+
+    return buf;
+}

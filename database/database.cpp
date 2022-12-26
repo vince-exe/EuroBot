@@ -86,7 +86,29 @@ bool Database::insertUser(User* user, DBErrors::SqlErrors* sqlErr) {
         Database::pstmt->setInt(3, user->getCoins());
 
         Database::pstmt->executeUpdate();
+        return true;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        sqlErr->error = true;
 
+        return false;
+    }
+}
+
+bool Database::insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr) {
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "INSERT INTO bet (userID, coins, state, date_) VALUES (?, ?, ?, ?);"
+        );
+        Database::pstmt->setString(1, std::to_string(userId));
+        Database::pstmt->setInt(2, bet.getMoney());
+        Database::pstmt->setInt(3, bet.getState());
+        Database::pstmt->setDateTime(4, bet.getDate());
+
+        Database::pstmt->executeUpdate();
         return true;
     }
     catch(sql::SQLException &e) {
@@ -120,5 +142,25 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
 
         sqlErr->error = true;
         return User();
+    }
+}
+
+bool Database::updateUserCoins(DBErrors::SqlErrors* sqlErr, User* user) {
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "UPDATE users SET coins = ? WHERE ID = ?;"
+        );
+        Database::pstmt->setInt(1, user->getCoins());
+        Database::pstmt->setString(2, std::to_string(user->getId()));
+        
+        Database::pstmt->executeUpdate();
+        return true;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+
+        return false;
     }
 }

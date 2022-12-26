@@ -22,12 +22,20 @@ int64_t User::getId() {
     return this->id;
 }
 
+Bet User::getBet() {
+    return this->bet;   
+}
+
 void User::addCoins(int coins) {
     this->coins += coins;
 }
 
 void User::remCoins(int coins) {
     this->coins -= coins;
+}
+
+void User::setBet(int money, int state, std::string date) {
+    this->bet.init(money, state, date);
 }
 
 std::vector<int64_t> UserManager::idVec;

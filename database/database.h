@@ -12,6 +12,7 @@
 #include <mysql-cppconn-8/jdbc/mysql_connection.h>
 
 #include "../user/user.h"
+#include "../bet/bet.h"
 
 namespace DBErrors {
     struct SqlErrors {
@@ -103,6 +104,21 @@ public:
     static bool insertUser(User* user, DBErrors::SqlErrors* sqlErr);
 
     /**
+     * @brief insert a bet in the database
+     * 
+     * @param userId the user unique identifier
+     * 
+     * @param bet the bet object
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     * 
+     * @return true if the insertion went fine
+     * 
+     * @return false if the insertion went not fine
+     */
+    static bool insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr);
+
+    /**
      * @brief return a User istance
      * 
      * @param id the unique identifier of the user
@@ -112,6 +128,21 @@ public:
      * @return User istance
      */
     static User getUser(int64_t id, DBErrors::SqlErrors* sqlErr);
+
+    /**
+     * @brief update a the 'coins' paramater of the user
+     * 
+     * @param id the user unique identifier
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     * 
+     * @param User a pointer to a user istance 
+     * 
+     * @return true if the update went fine
+     *  
+     * @return false if the update went not fine 
+     */
+    static bool updateUserCoins(DBErrors::SqlErrors* sqlErr, User* user);
 };
 
 #endif

@@ -50,6 +50,15 @@ namespace BotUtils {
      * @param sqlErr the DBErros::SqlErros* pointer to struct for database errors
      */
     void printFatalErrorDB(DBErrors::SqlErrors* sqlErr);
+
+    /**
+     * @brief return the current date under a specific format
+     * 
+     * @param format the format to build the date
+     * 
+     * @return the current date under a specific given format
+     */
+    const std::string currentDateTime(const std::string& format);
 }
 
 #endif

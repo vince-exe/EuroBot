@@ -44,7 +44,7 @@ void CommandsUtils::printWinBet(TgBot::Bot* bot, int64_t id, int win, User* user
     bot->getApi().sendMessage(
         id,
         "🤖 <b>Scommessa Effettuata</b> \
-        \n\n✅ @" + user->getUsername() + " <i>ha vinto " + win_ + "</i> \
+        \n\n✅ @" + user->getUsername() + " <i>ha vinto " + win_ +  " " + AdminSettings::getCoinName() + "</i> \
         \n\n💰 <b>Saldo Attuale</b>: " + money,
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );
@@ -57,7 +57,7 @@ void CommandsUtils::printLoseBet(TgBot::Bot* bot, int64_t id, int lose, User* us
     bot->getApi().sendMessage(
         id,
         "🤖 <b>Scommessa Effettuata</b> \
-        \n\n❌ @" + user->getUsername() + " <i>ha perso " + lose_ + "</i> \
+        \n\n❌ @" + user->getUsername() + " <i>ha perso " + lose_ +  " " + AdminSettings::getCoinName() + "</i> \
         \n\n💰 <b>Saldo Attuale</b>: " + money,
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );

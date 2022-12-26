@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "../bet/bet.h"
 
 class User {
 private:
@@ -13,6 +14,8 @@ private:
     int64_t id;
 
     int coins;
+
+    Bet bet;
 
 public:
     User();
@@ -25,9 +28,13 @@ public:
 
     int getCoins();
 
+    Bet getBet();
+
     void addCoins(int coins);
 
     void remCoins(int coins);
+
+    void setBet(int money, int state, std::string date);
 };
 
 class UserManager {

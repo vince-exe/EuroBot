@@ -182,18 +182,32 @@ void BotCommands::stake() {
         if(value > user.getCoins()) {
             return;
         }
+        
+        int check = BotUtils::getRandom(0, 1);
+        int money = 0;
+        user.setBet(value, check, BotUtils::currentDateTime("%Y-%m-%d"));
 
-        if(BotUtils::getRandom(0, 1)) {
-            int win = (value * AdminSettings::getWinPercentage()) / 100;
-            user.addCoins(win);
-
-            CommandsUtils::printWinBet(this->bot, message->chat->id, win, &user);
+        if(check) {
+            money = (value * AdminSettings::getWinPercentage()) / 100;
+            user.addCoins(money);
         }
         else {
-            int lose = (value * AdminSettings::getLosePercentage()) / 100;
-            user.remCoins(lose);
+            money = (value * AdminSettings::getLosePercentage()) / 100;
+            user.remCoins(money);
+        }
 
-            CommandsUtils::printLoseBet(this->bot, message->chat->id, lose,&user);
+        if(!Database::updateUserCoins(&sqlErr, &user) || !Database::insertBet(user.getId(), user.getBet(), &sqlErr)) {
+            CommandsUtils::fatalError(this->bot, message->chat->id);
+            BotUtils::printFatalErrorDB(&sqlErr);
+
+            exit(EXIT_FAILURE);
+        }
+
+        if(check) {
+            CommandsUtils::printWinBet(this->bot, message->chat->id, money, &user);
+        }
+        else {
+            CommandsUtils::printLoseBet(this->bot, message->chat->id, money, &user);
         }
     });
 }
