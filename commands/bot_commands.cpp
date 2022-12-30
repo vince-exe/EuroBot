@@ -179,7 +179,7 @@ void BotCommands::stake() {
             exit(EXIT_FAILURE);
         }
         
-        if(value > user.getCoins()) {
+        if(value > user.getCoins() || value <= 0) {
             return;
         }
         
