@@ -51,3 +51,7 @@ bool UserManager::exist(int64_t id) {
 void UserManager::push(int64_t id) {
     UserManager::idVec.push_back(id);
 }
+
+void UserManager::clear() {
+    UserManager::idVec.clear();
+}

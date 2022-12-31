@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 #include <mysql-cppconn-8/jdbc/cppconn/driver.h>
 #include <mysql-cppconn-8/jdbc/cppconn/connection.h>
@@ -150,6 +151,17 @@ public:
      * 
      */
     static bool insertLoan(Loan& loan, DBErrors::SqlErrors* sqlErr);
+
+    /**
+     * @brief get a vector of bets in the given date
+     * 
+     * @param userID user unique identifier
+     * 
+     * @param date date of the bets
+     *  
+     * @param sqlErr a pointer to struct used when an error is present
+     */
+    static std::vector<Bet> getBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr);
 
     /**
      * @brief update a the 'coins' paramater of the user

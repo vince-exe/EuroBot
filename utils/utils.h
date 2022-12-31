@@ -11,7 +11,7 @@
 #include <random>
 
 #include "../database/database.h"
-
+#include "./AdminSettings/admin_settings.h"
 
 namespace BotUtils {
     /**
@@ -59,6 +59,13 @@ namespace BotUtils {
      * @return the current date under a specific given format
      */
     const std::string currentDateTime(const std::string& format);
+    
+    /**
+     * @brief return a profit pair
+     * 
+     * @param bets vector of bets
+     */
+    std::pair<std::string, int> getProfit(std::vector<Bet>& bets); 
 }
 
 #endif

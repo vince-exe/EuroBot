@@ -15,6 +15,7 @@
 #include "../AdminSettings/admin_settings.h"
 #include "../utils.h"
 #include "../../loan/loan.h"
+#include "../../user/user.h"
 
 class CommandsUtils {
 public:
@@ -48,6 +49,8 @@ public:
     static void printLoseBet(TgBot::Bot* bot, int64_t id, int lose, User* user);
 
     static void printGameSettings(TgBot::Bot* bot, int64_t chatId);
+
+    static void printUserStats(TgBot::Bot* bot, User& user, int64_t chatID, int nBets, std::pair<std::string, int> profit);
 
     static void printAdminJoin(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user);
 

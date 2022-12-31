@@ -16,6 +16,8 @@ private:
 public:
     Bet() = default;
 
+    Bet(int money, int state, std::string date);
+
     void init(int money, int state, std::string date);
 
     int getMoney();

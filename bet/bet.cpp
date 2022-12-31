@@ -1,5 +1,11 @@
 #include "bet.h"
 
+Bet::Bet(int money, int state, std::string date) {
+    this->money = money;
+    this->state = state;
+    this->date = date;
+}
+
 void Bet::init(int money, int state, std::string date) {
     this->money = money;
     this->state = state;

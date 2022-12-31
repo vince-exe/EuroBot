@@ -44,3 +44,17 @@ const std::string BotUtils::currentDateTime(const std::string& format) {
 
     return buf;
 }
+
+std::pair<std::string, int> BotUtils::getProfit(std::vector<Bet>& bets) {
+    int goodProfit = 0, badProfit = 0;
+    for(auto bet : bets) { 
+        if(bet.getState()) { goodProfit += (bet.getMoney() * AdminSettings::getWinPercentage()) / 100;}
+        else { badProfit += (bet.getMoney() * AdminSettings::getLosePercentage()) / 100; }
+    }
+
+    if(goodProfit == badProfit) { return {"n", 0}; }
+    
+    if(goodProfit > badProfit) { return {"win", goodProfit - badProfit}; }
+
+    return {"lose", badProfit - goodProfit};
+}

@@ -151,7 +151,7 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
         );
         Database::pstmt->setString(1, std::to_string(id));
         Database::res = Database::pstmt->executeQuery();
-
+        
         if(res->next()) {
             return User(strtoll(res->getString("ID").c_str(), NULL, 0), res->getString("username"), res->getInt(3));
         }
@@ -164,6 +164,31 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
 
         sqlErr->error = true;
         return User(-1, "", 0);
+    }
+}
+
+std::vector<Bet> Database::getBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr) {
+    std::vector<Bet> todayBets;
+
+    try {   
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT coins, state, date_ FROM bet WHERE userID = ? AND date_ = ?;"
+        );
+        Database::pstmt->setString(1, std::to_string(userID));
+        Database::pstmt->setDateTime(2, date);
+
+        Database::res = Database::pstmt->executeQuery();
+
+        while(res->next()) {
+            todayBets.push_back(Bet(res->getInt(1), res->getInt(2), res->getString(3)));
+        }
+        return todayBets;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        return {};
     }
 }
 

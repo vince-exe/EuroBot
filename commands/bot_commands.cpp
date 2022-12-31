@@ -217,7 +217,7 @@ void BotCommands::stake() {
 
 void BotCommands::give_to() {
     this->bot->getEvents().onCommand("presta", [this](TgBot::Message::Ptr message) {
-        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || CommandsUtils::countArguments("/presta", message->text) != 2) {
+        if(CommandsUtils::countArguments("/presta", message->text) != 2) {
             return;
         }
 
@@ -235,16 +235,11 @@ void BotCommands::give_to() {
         User donator = Database::getUser(message->from->id, &sqlErr);
         User receiver = Database::getUser(receiverUsername, &sqlErr);
 
-        if(donator.getUsername() == receiver.getUsername()) { std::cout<<"\nsame user";return; }
-        if(moneyToGive > donator.getCoins() || moneyToGive <= 0 || !UserManager::exist(receiver.getId())) { return; }
+        if(donator.getUsername() == receiver.getUsername()) { return; }
+        if(moneyToGive > donator.getCoins() || moneyToGive <= 0) { return; }
 
-        if(donator.getId() == -1) {
-            CommandsUtils::fatalError(this->bot, message->chat->id);
-            BotUtils::printFatalErrorDB(&sqlErr);
-                
-            exit(EXIT_FAILURE);
-        }
-
+        if(donator.getId() == -1 || receiver.getId() == -1) { return; }
+        
         donator.remCoins(moneyToGive);
         receiver.addCoins(moneyToGive);
 
@@ -264,33 +259,26 @@ void BotCommands::give_to() {
 void BotCommands::stats() {
     this->bot->getEvents().onCommand("stats", [this](TgBot::Message::Ptr message) {
         int args = CommandsUtils::countArguments("/stats", message->text);
+        if(args >= 2) { return; }  
 
-        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || (args != 0 || args != 1)) {
-            return;
-        }  
+        std::string username;
         DBErrors::SqlErrors sqlErr;
 
         if(args) {
             std::string usernameStr = CommandsUtils::getArguments("/stats", message->text)[0];
             if(usernameStr[0] != '@') { return; }
 
-            User user = Database::getUser(usernameStr, &sqlErr);
-            if(user.getId() == -1 || !UserManager::exist(user.getId())) { return; }
-
-
-            /* print stats */
+            username = usernameStr.erase(0, 1);
         }
         else {
-            User user = Database::getUser(message->from->id, &sqlErr);
-            if(user.getId() == -1) {
-                CommandsUtils::fatalError(this->bot, message->chat->id);
-                BotUtils::printFatalErrorDB(&sqlErr);
-
-                exit(EXIT_FAILURE);
-            }
-
-            /* print stats */
+            username = message->from->username;
         }
+
+        User user = Database::getUser(username, &sqlErr);
+        if(user.getId() == -1) { return; }
+
+        std::vector<Bet> todayBets = Database::getBets(user.getId(), BotUtils::currentDateTime("%Y-%m-%d"), &sqlErr);
+        CommandsUtils::printUserStats(this->bot, user, message->chat->id, todayBets.size(), BotUtils::getProfit(todayBets));
     });
 }
 
@@ -356,6 +344,7 @@ void BotCommands::callBackQuery() {
                     this->bot->getApi().deleteMessage(query->message->chat->id, query->message->messageId);
 
                     if(CommandsUtils::startBot(this->bot, query->message->chat->id, user)) {
+                        UserManager::clear();
                         CommandsUtils::printStartPanel(this->bot, query->message->chat->id, user, this->startKeyBoard);
                     }
                 }

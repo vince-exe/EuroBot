@@ -45,6 +45,8 @@ public:
     static bool exist(int64_t id);
 
     static void push(int64_t id);
+
+    static void clear();
 };
 
 #endif
