@@ -13,6 +13,7 @@
 
 #include "../user/user.h"
 #include "../bet/bet.h"
+#include "../loan/loan.h"
 
 namespace DBErrors {
     struct SqlErrors {
@@ -128,6 +129,27 @@ public:
      * @return User istance
      */
     static User getUser(int64_t id, DBErrors::SqlErrors* sqlErr);
+
+    /**
+     * @brief return a User istance
+     * 
+     * @param username the username of the user
+     * 
+     * @param sqlEerr a pointer to struct used when an error is present
+     * 
+     * @return User istance
+     */
+    static User getUser(const std::string& username, DBErrors::SqlErrors* sqlErr);
+    
+    /**
+     * @brief insert a loan in the database
+     *  
+     * @param loan the loan to insert
+     *  
+     * @param sqlErr a pointer to struct used when an error is present
+     * 
+     */
+    static bool insertLoan(Loan& loan, DBErrors::SqlErrors* sqlErr);
 
     /**
      * @brief update a the 'coins' paramater of the user

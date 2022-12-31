@@ -200,6 +200,16 @@ void CommandsUtils::editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr
     );
 }
 
+void CommandsUtils::printLoan(TgBot::Bot* bot, int64_t chatID, const std::string& donUsr, const std::string& recUsr, int money) {
+    bot->getApi().sendMessage(
+        chatID,
+        "👑 <b>Prestito Effettuato</b> " \
+        "\n\n🎩 L'utente @" + donUsr + " ha donato " + std::to_string(money) + " " + AdminSettings::getCoinName() + " a @" + recUsr \
+        + "\n\n🪙 Questo si che è un atto di generosità",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    ); 
+}
+
 void CommandsUtils::printToS(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard) {
     bot->getApi().editMessageText(
         "<b>✏️ Termini & Condizioni </b> \

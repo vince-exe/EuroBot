@@ -14,6 +14,7 @@
 #include "../JsonReader/json_reader.h"
 #include "../AdminSettings/admin_settings.h"
 #include "../utils.h"
+#include "../../loan/loan.h"
 
 class CommandsUtils {
 public:
@@ -59,6 +60,8 @@ public:
     static void editGeneralPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
     
     static void printSettingsPanel(TgBot::Bot* bot, std::pair<int64_t, int32_t> ids, TgBot::InlineKeyboardMarkup::Ptr keyboard);
+
+    static void printLoan(TgBot::Bot* bot, int64_t chatID, const std::string& donUsr, const std::string& recUsr, int money);
 
     static void editSettingsPanel(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
     

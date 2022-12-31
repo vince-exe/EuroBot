@@ -3,7 +3,7 @@
 BotCommands::BotCommands(TgBot::Bot* bot) {
     this->bot = bot;
     this->eventBroadCaster = &this->bot->getEvents();
-    
+        
     TgBot::InlineKeyboardMarkup::Ptr startKeyBoard(new TgBot::InlineKeyboardMarkup);
     this->startKeyBoard = startKeyBoard;
 
@@ -21,6 +21,7 @@ BotCommands::BotCommands(TgBot::Bot* bot) {
 
     TgBot::InlineKeyboardMarkup::Ptr confirmBoard(new TgBot::InlineKeyboardMarkup);
     this->confirmBoard = confirmBoard;
+    
 }
 
 BotCommands::~BotCommands() {
@@ -67,12 +68,13 @@ void BotCommands::init() {
         {"✅ Conferma", "confirm"}
     }
     );
-
+    
     this->start();
     this->update();
     this->join();
     this->infoGame();
     this->stake();
+    this->give_to();
     this->callBackQuery();
 }
 
@@ -209,6 +211,50 @@ void BotCommands::stake() {
         else {
             CommandsUtils::printLoseBet(this->bot, message->chat->id, money, &user);
         }
+    });
+}
+
+void BotCommands::give_to() {
+    this->bot->getEvents().onCommand("presta", [this](TgBot::Message::Ptr message) {
+        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || CommandsUtils::countArguments("/presta", message->text) != 2) {
+            return;
+        }
+
+        std::string receiverUsername = CommandsUtils::getArguments("/presta", message->text)[0];
+        if(receiverUsername[0] == '@') { receiverUsername.erase(0, 1); }
+
+        int moneyToGive;
+        if(!CommandsUtils::toInt(&moneyToGive, CommandsUtils::getArguments("/presta", message->text)[1])) {
+            return;
+        }
+        
+        DBErrors::SqlErrors sqlErr;
+        User donator = Database::getUser(message->from->id, &sqlErr);
+        User receiver = Database::getUser(receiverUsername, &sqlErr);
+
+        if(donator.getUsername() == receiver.getUsername()) { std::cout<<"\nsame user";return; }
+        if(moneyToGive > donator.getCoins() || moneyToGive <= 0 || !UserManager::exist(receiver.getId())) { return; }
+
+        if(donator.getId() == -1) {
+            CommandsUtils::fatalError(this->bot, message->chat->id);
+            BotUtils::printFatalErrorDB(&sqlErr);
+                
+            exit(EXIT_FAILURE);
+        }
+
+        donator.remCoins(moneyToGive);
+        receiver.addCoins(moneyToGive);
+
+        Loan loan(donator.getId(), receiver.getId(), moneyToGive, BotUtils::currentDateTime("%Y-%m-%d"));
+
+        if (!Database::updateUserCoins(&sqlErr, &donator) || !Database::updateUserCoins(&sqlErr, &receiver) ||  !Database::insertLoan(loan, &sqlErr)) {
+            CommandsUtils::fatalError(this->bot, message->chat->id);
+            BotUtils::printFatalErrorDB(&sqlErr);
+
+            exit(EXIT_FAILURE);
+        }
+
+        CommandsUtils::printLoan(this->bot, message->chat->id, donator.getUsername(), receiver.getUsername(), moneyToGive);
     });
 }
 

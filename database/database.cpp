@@ -121,6 +121,28 @@ bool Database::insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr) {
     }
 }
 
+bool Database::insertLoan(Loan& loan, DBErrors::SqlErrors* sqlErr) {
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "INSERT INTO loans (donatorID, receiverID, coins, date_) VALUES (?, ?, ?, ?);"
+        );
+        Database::pstmt->setString(1, std::to_string(loan.getDonatorID()));
+        Database::pstmt->setString(2, std::to_string(loan.getRecevierID()));
+        Database::pstmt->setInt(3, loan.getCoins());
+        Database::pstmt->setDateTime(4, loan.getDate());
+
+        Database::pstmt->executeUpdate();
+        return true;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+
+        return false;
+    }
+}
+
 User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
     try {
         sqlErr->error = false;
@@ -133,7 +155,7 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
         if(res->next()) {
             return User(strtoll(res->getString("ID").c_str(), NULL, 0), res->getString("username"), res->getInt(3));
         }
-        return User();
+        return User(-1, "", 0);
     }
     catch(sql::SQLException &e) {
         sqlErr->what = e.what();
@@ -141,7 +163,31 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
         sqlErr->sqlState = e.getSQLState();
 
         sqlErr->error = true;
-        return User();
+        return User(-1, "", 0);
+    }
+}
+
+User Database::getUser(const std::string& username, DBErrors::SqlErrors* sqlErr) {
+    try {
+        sqlErr->error = false;
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT * FROM users WHERE username = ?;"
+        );
+        Database::pstmt->setString(1, username);
+        Database::res = Database::pstmt->executeQuery();
+
+        if(res->next()) {
+            return User(strtoll(res->getString("ID").c_str(), NULL, 0), res->getString("username"), res->getInt(3));
+        }
+        return User(-1, "", 0);
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+
+        sqlErr->error = true;
+        return User(-1, "", 0);
     }
 }
 

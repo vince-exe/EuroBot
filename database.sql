@@ -17,3 +17,14 @@ CREATE TABLE bet (
     
     FOREIGN KEY (userID) REFERENCES users(ID)
 );
+
+CREATE TABLE loans (
+	ID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    donatorID varchar(30) NOT NULL,
+    receiverID varchar(30) NOT NULL,
+    coins int NOT NULL,
+    date_ DATE NOT NULL,
+    
+    FOREIGN KEY (donatorID) REFERENCES users(ID),
+    FOREIGN KEY (receiverID) REFERENCES users(ID)
+);

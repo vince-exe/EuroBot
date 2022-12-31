@@ -37,5 +37,7 @@ int main() {
         std::cout<<"\nerror: " << e.what();
     }
 
+    Database::destroy();
+    
     return EXIT_SUCCESS;
 }

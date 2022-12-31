@@ -12,7 +12,7 @@
 #include "../utils/AdminSettings/admin_settings.h"
 
 #include "../user/user.h"
-
+#include "../loan/loan.h"
 
 class BotCommands {
 private:
@@ -47,6 +47,8 @@ private:
     void infoGame();
     
     void stake();
+
+    void give_to();
 
     void callBackQuery();
 
