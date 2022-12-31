@@ -75,6 +75,7 @@ void BotCommands::init() {
     this->infoGame();
     this->stake();
     this->give_to();
+    this->stats();
     this->callBackQuery();
 }
 
@@ -221,7 +222,9 @@ void BotCommands::give_to() {
         }
 
         std::string receiverUsername = CommandsUtils::getArguments("/presta", message->text)[0];
-        if(receiverUsername[0] == '@') { receiverUsername.erase(0, 1); }
+
+        if(receiverUsername[0] != '@') { return; }
+        receiverUsername.erase(0, 1);
 
         int moneyToGive;
         if(!CommandsUtils::toInt(&moneyToGive, CommandsUtils::getArguments("/presta", message->text)[1])) {
@@ -255,6 +258,39 @@ void BotCommands::give_to() {
         }
 
         CommandsUtils::printLoan(this->bot, message->chat->id, donator.getUsername(), receiver.getUsername(), moneyToGive);
+    });
+}
+
+void BotCommands::stats() {
+    this->bot->getEvents().onCommand("stats", [this](TgBot::Message::Ptr message) {
+        int args = CommandsUtils::countArguments("/stats", message->text);
+
+        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || (args != 0 || args != 1)) {
+            return;
+        }  
+        DBErrors::SqlErrors sqlErr;
+
+        if(args) {
+            std::string usernameStr = CommandsUtils::getArguments("/stats", message->text)[0];
+            if(usernameStr[0] != '@') { return; }
+
+            User user = Database::getUser(usernameStr, &sqlErr);
+            if(user.getId() == -1 || !UserManager::exist(user.getId())) { return; }
+
+
+            /* print stats */
+        }
+        else {
+            User user = Database::getUser(message->from->id, &sqlErr);
+            if(user.getId() == -1) {
+                CommandsUtils::fatalError(this->bot, message->chat->id);
+                BotUtils::printFatalErrorDB(&sqlErr);
+
+                exit(EXIT_FAILURE);
+            }
+
+            /* print stats */
+        }
     });
 }
 

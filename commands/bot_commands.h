@@ -52,6 +52,8 @@ private:
 
     void callBackQuery();
 
+    void stats();
+    
 public:
     /**
      * @brief Construct a new Bot Commands object
