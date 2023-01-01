@@ -50,6 +50,8 @@ private:
 
     void give_to();
 
+    void list();
+    
     void callBackQuery();
 
     void stats();

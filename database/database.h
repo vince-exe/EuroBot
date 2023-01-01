@@ -164,6 +164,14 @@ public:
     static std::vector<Bet> getBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr);
 
     /**
+     * @brief get a vector filled with the user's username
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     * 
+     */
+    static std::vector<std::string> getUsersList(DBErrors::SqlErrors* sqlErr);
+
+    /**
      * @brief update a the 'coins' paramater of the user
      * 
      * @param id the user unique identifier

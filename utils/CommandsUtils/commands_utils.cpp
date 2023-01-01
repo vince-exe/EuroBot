@@ -224,6 +224,37 @@ void CommandsUtils::printUserStats(TgBot::Bot* bot, User& user, int64_t chatID, 
     );
 }
 
+void CommandsUtils::printUsersList(TgBot::Bot* bot, int64_t id, std::vector<std::string>& usersList) {
+    std::string text;
+    int c = 0;
+    for(auto &user : usersList) {
+        if(c == 0) {  
+            text += "\n\n🥇 @" + user;
+        }
+        else if(c == 1) {
+            text += "\n\n🥈 @" + user;
+        }
+        else if(c == 2) {
+            text += "\n\n🥉 @" + user;
+        }
+        c++;
+    }
+    text += "\n\n📬 Per avere maggiori informazioni utilizza il comando /stats.";
+    bot->getApi().sendMessage(
+        id,
+        "🏆 <b>Classifica Giocatori</b> " + text,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::noUserMsg(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id,
+        "🤖 <p>La lista utenti è vuota</p>",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
 void CommandsUtils::printLoan(TgBot::Bot* bot, int64_t chatID, const std::string& donUsr, const std::string& recUsr, int money) {
     bot->getApi().sendMessage(
         chatID,

@@ -192,6 +192,28 @@ std::vector<Bet> Database::getBets(int64_t userID, const std::string& date, DBEr
     }
 }
 
+std::vector<std::string> Database::getUsersList(DBErrors::SqlErrors* sqlErr) {
+    std::vector<std::string> usernameVec;
+
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT username FROM users  ORDER BY coins DESC LIMIT 3"
+        );
+        Database::res = Database::pstmt->executeQuery();
+
+        while(res->next()) {
+            usernameVec.push_back(res->getString("username"));
+        }
+        return usernameVec;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        return {};
+    }
+}
+
 User Database::getUser(const std::string& username, DBErrors::SqlErrors* sqlErr) {
     try {
         sqlErr->error = false;

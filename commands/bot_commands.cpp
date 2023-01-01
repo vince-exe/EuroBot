@@ -76,6 +76,7 @@ void BotCommands::init() {
     this->stake();
     this->give_to();
     this->stats();
+    this->list();
     this->callBackQuery();
 }
 
@@ -279,6 +280,21 @@ void BotCommands::stats() {
 
         std::vector<Bet> todayBets = Database::getBets(user.getId(), BotUtils::currentDateTime("%Y-%m-%d"), &sqlErr);
         CommandsUtils::printUserStats(this->bot, user, message->chat->id, todayBets.size(), BotUtils::getProfit(todayBets));
+    });
+}
+
+void BotCommands::list() {
+    this->bot->getEvents().onCommand("classifica", [this](TgBot::Message::Ptr message) {
+        DBErrors::SqlErrors sqlErr;
+        std::vector<std::string> usernameVec = Database::getUsersList(&sqlErr);
+
+        if(usernameVec.empty()) { 
+            CommandsUtils::noUserMsg(this->bot, message->chat->id);
+            return;
+        }
+        else {
+            CommandsUtils::printUsersList(this->bot, message->chat->id, usernameVec);
+        }
     });
 }
 
