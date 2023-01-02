@@ -149,7 +149,7 @@ void BotCommands::join() {
                 \n\n⭐ <i>@" + message->from->username + " si è unito alla partita</i>",
                 false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
             );
-        
+
             UserManager::push(message->from->id);
         }
     });     
@@ -169,13 +169,20 @@ void BotCommands::stake() {
         if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || CommandsUtils::countArguments("/punta", message->text) != 1) {
             return;
         }
+
+        DBErrors::SqlErrors sqlErr;
         int value;
+        int maxBets = AdminSettings::dailyBets();
+        
+        if(maxBets != -1 && Database::getNumBets(message->from->id, BotUtils::currentDateTime("%Y-%m-%d"), &sqlErr) >= maxBets) {
+            CommandsUtils::cantStake(this->bot, message->chat->id);
+            return;
+        }
         if(!CommandsUtils::toInt(&value, CommandsUtils::getArguments("/punta", message->text)[0])) {
             return;
         }
-        DBErrors::SqlErrors sqlErr;
-        User user = Database::getUser(message->from->id, &sqlErr);
         
+        User user = Database::getUser(message->from->id, &sqlErr);
         if(user.getId() == -1) {
             CommandsUtils::fatalError(this->bot, message->chat->id);
             BotUtils::printFatalErrorDB(&sqlErr);
@@ -218,6 +225,11 @@ void BotCommands::stake() {
 
 void BotCommands::give_to() {
     this->bot->getEvents().onCommand("presta", [this](TgBot::Message::Ptr message) {
+        if(!AdminSettings::giveMoney()) {
+            CommandsUtils::cantGiveMoney(this->bot, message->chat->id);
+            return;
+        }
+
         if(CommandsUtils::countArguments("/presta", message->text) != 2) {
             return;
         }
@@ -285,8 +297,13 @@ void BotCommands::stats() {
 
 void BotCommands::list() {
     this->bot->getEvents().onCommand("classifica", [this](TgBot::Message::Ptr message) {
+        if(!AdminSettings::showClassification()) {
+            CommandsUtils::cantSeeClassification(this->bot, message->chat->id);
+            return;
+        }
+
         DBErrors::SqlErrors sqlErr;
-        std::vector<std::string> usernameVec = Database::getUsersList(&sqlErr);
+        std::vector<std::string> usernameVec = Database::getClassification(&sqlErr, 3);
 
         if(usernameVec.empty()) { 
             CommandsUtils::noUserMsg(this->bot, message->chat->id);

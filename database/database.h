@@ -169,8 +169,19 @@ public:
      * @param sqlErr a pointer to struct used when an error is present
      * 
      */
-    static std::vector<std::string> getUsersList(DBErrors::SqlErrors* sqlErr);
+    static std::vector<std::string> getClassification(DBErrors::SqlErrors* sqlErr, int maxPositions);
 
+    /**
+     * @brief get the num of bets of a user
+     * 
+     * @param userID user unique identifier
+     *  
+     * @param date date of the bets
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     */
+    static int getNumBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr);
+    
     /**
      * @brief update a the 'coins' paramater of the user
      * 

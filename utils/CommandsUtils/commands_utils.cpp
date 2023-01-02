@@ -224,6 +224,33 @@ void CommandsUtils::printUserStats(TgBot::Bot* bot, User& user, int64_t chatID, 
     );
 }
 
+void CommandsUtils::cantGiveMoney(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id, 
+        "📛 <b>Avviso Partita</b> \ 
+        \n\n🤖 L'amministratore ha disattivato il prestito dei soldi per questa partita.",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::cantStake(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id, 
+        "📛 <b>Avviso Partita</b> \ 
+        \n\n🤖 Hai esaurito il numero di scommesse giornaliere",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::cantSeeClassification(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id,
+        "📛 <b>Avviso Partita</b> \ 
+        \n\n🤖 L'amministratore ha disattivato la classifica per questa partita.",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
 void CommandsUtils::printUsersList(TgBot::Bot* bot, int64_t id, std::vector<std::string>& usersList) {
     std::string text;
     int c = 0;
@@ -250,7 +277,7 @@ void CommandsUtils::printUsersList(TgBot::Bot* bot, int64_t id, std::vector<std:
 void CommandsUtils::noUserMsg(TgBot::Bot* bot, int64_t id) {
     bot->getApi().sendMessage(
         id,
-        "🤖 <p>La lista utenti è vuota</p>",
+        "🤖 <i>La lista utenti è vuota</i>",
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );
 }

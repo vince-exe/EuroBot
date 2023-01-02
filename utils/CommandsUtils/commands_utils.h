@@ -46,6 +46,12 @@ public:
 
     static void printWinBet(TgBot::Bot* bot, int64_t id, int win, User* user);
 
+    static void cantGiveMoney(TgBot::Bot* bot, int64_t id);
+    
+    static void cantSeeClassification(TgBot::Bot* bot, int64_t id);
+
+    static void cantStake(TgBot::Bot* bot, int64_t id);
+
     static void printUsersList(TgBot::Bot* bot, int64_t id, std::vector<std::string>& usersList);
 
     static void noUserMsg(TgBot::Bot* bot, int64_t id);

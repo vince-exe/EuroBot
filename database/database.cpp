@@ -169,7 +169,7 @@ User Database::getUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
 
 std::vector<Bet> Database::getBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr) {
     std::vector<Bet> todayBets;
-
+    
     try {   
         Database::pstmt = Database::con->prepareStatement(
             "SELECT coins, state, date_ FROM bet WHERE userID = ? AND date_ = ?;"
@@ -188,17 +188,43 @@ std::vector<Bet> Database::getBets(int64_t userID, const std::string& date, DBEr
         sqlErr->what = e.what();
         sqlErr->errCode = e.getErrorCode();
         sqlErr->sqlState = e.getSQLState();
+
         return {};
     }
 }
 
-std::vector<std::string> Database::getUsersList(DBErrors::SqlErrors* sqlErr) {
+int Database::getNumBets(int64_t userID, const std::string& date, DBErrors::SqlErrors* sqlErr) {
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT COUNT(*) FROM bet WHERE userID = ? AND date_ = ?"
+        );
+        Database::pstmt->setString(1, std::to_string(userID));
+        Database::pstmt->setDateTime(2, date);
+
+        Database::res = Database::pstmt->executeQuery();
+        if(res->next()) {
+            return res->getInt(1);
+        }
+        return 0;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+
+        return -1;
+    }
+
+}
+
+std::vector<std::string> Database::getClassification(DBErrors::SqlErrors* sqlErr, int maxPositions) {
     std::vector<std::string> usernameVec;
 
     try {
         Database::pstmt = Database::con->prepareStatement(
-            "SELECT username FROM users  ORDER BY coins DESC LIMIT 3"
+            "SELECT username FROM users  ORDER BY coins DESC LIMIT ?"
         );
+        Database::pstmt->setInt(1, maxPositions);
         Database::res = Database::pstmt->executeQuery();
 
         while(res->next()) {

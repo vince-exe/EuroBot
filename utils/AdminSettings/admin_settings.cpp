@@ -43,7 +43,7 @@ int AdminSettings::getMoney() {
 }
 
 int AdminSettings::dailyBets() {
-    return std::atoi(AdminSettings::settingsList["ScommesseGiornaliere"].c_str());
+    return std::stoi(AdminSettings::settingsList["ScommesseGiornaliere"]);
 }
 
 bool AdminSettings::giveMoney() {
