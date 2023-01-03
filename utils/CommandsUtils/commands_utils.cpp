@@ -412,3 +412,64 @@ std::vector<std::string> CommandsUtils::getArguments(const std::string command, 
 
     return argumentsList;
 }
+
+void CommandsUtils::historyBets(TgBot::Bot* bot, int64_t chatID, const std::string& date, std::vector<Bet>& bets, std::string username) {
+    std::string text;
+    std::string text1;
+    int cWin = 0;
+    int sumCoins = 0;
+    for(auto& bet : bets) {
+        text +="\n\n🔖 <b>Id:</b> " + std::to_string(bet.getId()) + "\n💰 <b>Valore:</b> " + std::to_string(bet.getMoney()) + "<b>" + BotUtils::getEmoji(std::to_string(bet.getState()), "1", {"\n✅ Vinta", "\n❌ Persa"}) + "</b>";
+        if(bet.getState()) { cWin++; }
+        sumCoins += bet.getMoney();
+    }
+    
+    if((bets.size() - cWin) == cWin) {
+        text1 += "🤖 Sembra che la situazione fosse pari";
+    }
+    else if((bets.size() - cWin) > cWin) {
+        text1 += "🤖 Situazione al quanto scomoda";
+    }
+    else {
+        text1 += "🤖 Wow ottimo risultato";
+    }
+    bot->getApi().sendMessage(
+        chatID, 
+        "📮 <b>Cronologia Scommesse</b> " + date + " " + \
+        text,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+    
+    bot->getApi().sendMessage(
+        chatID,
+        "📝 <b>Riepilogo Cronologia</b> \
+        \n\n⛑️ <b>Utente:</b> @" + username + " " + \
+        "\n\n❌ <b>Scommesse Perse:</b> " + std::to_string(bets.size() - cWin) + \
+        "\n\n✅ <b>Scommesse Vinte:</b> " + std::to_string(cWin) + \
+        "\n\n💰 <b>Totale Denaro:</b> " + std::to_string(sumCoins) + \
+        "\n\n" + text1,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::noBets(TgBot::Bot* bot, int64_t chatID, std::string& date, bool anotherUser, const std::string& username) {
+    if(date == BotUtils::currentDateTime("%Y-%m-%d")) {
+        date = "oggi";
+    }
+    else {
+        std::string tmp = date;
+        date = "il " + tmp;
+    }
+    if(anotherUser) {
+        bot->getApi().sendMessage(
+            chatID,
+            "📮 L'utente @" + username + " non ha effettuato nessuna scommessa " + date
+        );
+        return;
+    }
+    bot->getApi().sendMessage(
+        chatID,
+        "📮 Non hai effettuato nessuna scommessa " + date + \
+        "\n\n🤖 Utilizza il comando /punta per effettuare una scommessa"
+    );
+}

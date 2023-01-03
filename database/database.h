@@ -121,6 +121,18 @@ public:
     static bool insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr);
 
     /**
+     * @brief get the bets on the given date
+     * 
+     * @param userId user unique identifier
+     *
+     * @param date the date of the bets
+     *
+     * @param sqlErr a pointer to struct used when an error is present
+     *
+     */
+    static std::vector<Bet> getBetsOn(int64_t userId, const std::string& date, DBErrors::SqlErrors* sqlErr);
+    
+    /**
      * @brief return a User istance
      * 
      * @param id the unique identifier of the user

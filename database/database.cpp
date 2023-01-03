@@ -121,6 +121,31 @@ bool Database::insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr) {
     }
 }
 
+std::vector<Bet> Database::getBetsOn(int64_t userId, const std::string& date, DBErrors::SqlErrors* sqlErr) {
+    std::vector<Bet> betVec;
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT ID, coins, state, date_ FROM testDB.bet WHERE userID = ? AND date_ = ?;"
+        );
+        Database::pstmt->setString(1, std::to_string(userId));
+        Database::pstmt->setDateTime(2, date);
+
+        Database::res = Database::pstmt->executeQuery();
+        while(res->next()) {
+            betVec.push_back(Bet(res->getInt(1), res->getInt(2), res->getInt(3), res->getString("date_")));
+        }
+        return betVec;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        sqlErr->error = true;
+
+        return {};
+    }
+}
+
 bool Database::insertLoan(Loan& loan, DBErrors::SqlErrors* sqlErr) {
     try {
         Database::pstmt = Database::con->prepareStatement(

@@ -77,6 +77,7 @@ void BotCommands::init() {
     this->give_to();
     this->stats();
     this->list();
+    this->historyBets();
     this->callBackQuery();
 }
 
@@ -157,10 +158,10 @@ void BotCommands::join() {
 
 void BotCommands::infoGame() {
     this->bot->getEvents().onCommand("infoGame", [this](TgBot::Message::Ptr message) {
-        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id)) {
+        if(!CommandsUtils::gameStarted || !UserManager::exist(message->from->id) || this->bot->getApi().blockedByUser(message->from->id)) {
             return;
         }
-        CommandsUtils::printGameSettings(this->bot, message->chat->id);
+        CommandsUtils::printGameSettings(this->bot, message->from->id);
     });
 }
 
@@ -278,10 +279,10 @@ void BotCommands::stats() {
         DBErrors::SqlErrors sqlErr;
 
         if(args) {
-            std::string usernameStr = CommandsUtils::getArguments("/stats", message->text)[0];
-            if(usernameStr[0] != '@') { return; }
+            username = CommandsUtils::getArguments("/stats", message->text)[0];
+            if(username[0] != '@') { return; }
 
-            username = usernameStr.erase(0, 1);
+            username.erase(0, 1);
         }
         else {
             username = message->from->username;
@@ -301,7 +302,7 @@ void BotCommands::list() {
             CommandsUtils::cantSeeClassification(this->bot, message->chat->id);
             return;
         }
-
+        
         DBErrors::SqlErrors sqlErr;
         std::vector<std::string> usernameVec = Database::getClassification(&sqlErr, 3);
 
@@ -311,6 +312,50 @@ void BotCommands::list() {
         }
         else {
             CommandsUtils::printUsersList(this->bot, message->chat->id, usernameVec);
+        }
+    });
+}
+
+void BotCommands::historyBets() {
+    this->bot->getEvents().onCommand("cronScommesse", [this](TgBot::Message::Ptr message) {
+        if(this->bot->getApi().blockedByUser(message->from->id)) { return; }
+        
+        int args = CommandsUtils::countArguments("/cronScommesse", message->text);
+        if(args == 0 && args >= 3) { return; }
+        
+        DBErrors::SqlErrors sqlErr;
+        std::string username;
+        std::string date;
+
+        if(args == 2) {
+            username = CommandsUtils::getArguments("/cronScommesse", message->text)[0];
+            if(username[0] != '@') { return; }
+
+            username.erase(0, 1);
+            date = CommandsUtils::getArguments("/cronScommesse", message->text)[1];
+        }
+        else {
+            username = message->from->username;
+            date = CommandsUtils::getArguments("/cronScommesse", message->text)[0];
+        }
+        User user = Database::getUser(username, &sqlErr);
+        if(user.getId() == -1) { return; }
+        
+        struct tm tm{};
+        
+        if(date == "oggi") {
+            date = BotUtils::currentDateTime("%Y-%m-%d");
+        }
+        else if(!strptime(date.c_str(), "%Y-%m-%d", &tm)) { 
+            return;
+        }
+        
+        std::vector<Bet> betVec = Database::getBetsOn(user.getId(), date, &sqlErr);
+        if(betVec.empty()) {
+            CommandsUtils::noBets(this->bot, message->from->id, date, (args == 2), username);
+        }
+        else {   
+            CommandsUtils::historyBets(this->bot, message->from->id, date, betVec, username);
         }
     });
 }

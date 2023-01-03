@@ -4,6 +4,7 @@
 #include <tgbot/tgbot.h>
 #include <unordered_map>
 #include <iostream>
+#include <ctime>
 
 #include "../utils/utils.h"
 #include "../database/database.h"
@@ -50,12 +51,14 @@ private:
 
     void give_to();
 
+    void stats();
+
     void list();
-    
+
+    void historyBets();
+
     void callBackQuery();
 
-    void stats();
-    
 public:
     /**
      * @brief Construct a new Bot Commands object
