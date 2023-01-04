@@ -428,7 +428,7 @@ void CommandsUtils::historyBets(TgBot::Bot* bot, int64_t chatID, const std::stri
         text1 += "🤖 Sembra che la situazione fosse pari";
     }
     else if((bets.size() - cWin) > cWin) {
-        text1 += "🤖 Situazione al quanto scomoda";
+        text1 += "🤖 Situazione abbastanza scomoda";
     }
     else {
         text1 += "🤖 Wow ottimo risultato";
@@ -447,6 +447,38 @@ void CommandsUtils::historyBets(TgBot::Bot* bot, int64_t chatID, const std::stri
         "\n\n❌ <b>Scommesse Perse:</b> " + std::to_string(bets.size() - cWin) + \
         "\n\n✅ <b>Scommesse Vinte:</b> " + std::to_string(cWin) + \
         "\n\n💰 <b>Totale Denaro:</b> " + std::to_string(sumCoins) + \
+        "\n\n" + text1,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+}
+
+void CommandsUtils::historyLoans(TgBot::Bot* bot, int64_t chatID, const std::string& date, std::vector<Loan>& loans, std::string username) {
+    std::string text;
+    std::string text1;
+    int numLoans = 0;
+    for(auto& loan : loans) {
+        text +="\n\n🔖 <b>Id:</b> " + std::to_string(loan.getId()) + "\n💰 <b>Valore:</b> " + std::to_string(loan.getCoins()) + "\n🌐 <b>Utente:</b> " + loan.getRecUsr();
+        numLoans++;
+    }
+    
+    if(numLoans >= 6) {
+        text1 += "👑 Si respira generosità nell'aria";
+    }
+    else {
+        text1 += "🤖 A quanto pare a qualcuno non piace prestare soldi";
+    }
+    bot->getApi().sendMessage(
+        chatID, 
+        "📬 <b>Cronologia Prestiti</b> " + date + " " + \
+        text,
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
+    
+    bot->getApi().sendMessage(
+        chatID,
+        "📝 <b>Riepilogo Cronologia</b> \
+        \n\n⛑️ <b>Donatore:</b> @" + username + " " + \
+        "\n\n📮 <b>Prestiti Totali:</b> " + std::to_string(numLoans) + " " + \
         "\n\n" + text1,
         false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
     );
@@ -471,5 +503,40 @@ void CommandsUtils::noBets(TgBot::Bot* bot, int64_t chatID, std::string& date, b
         chatID,
         "📮 Non hai effettuato nessuna scommessa " + date + \
         "\n\n🤖 Utilizza il comando /punta per effettuare una scommessa"
+    );
+}
+
+void CommandsUtils::noLoans(TgBot::Bot* bot, int64_t chatID, std::string& date, bool anotherUser, const std::string& username) {
+    if(date == BotUtils::currentDateTime("%Y-%m-%d")) {
+        date = "oggi";
+    }
+    else {
+        std::string tmp = date;
+        date = "il " + tmp;
+    }
+    if(anotherUser) {
+        bot->getApi().sendMessage(
+            chatID,
+            "📬 L'utente @" + username + " non ha effettuato nessun prestito " + date
+        );
+        return;
+    }
+    bot->getApi().sendMessage(
+        chatID,
+        "📬 Non hai effettuato nessun prestito " + date + \
+        "\n\n🤖 Utilizza il comando /presta per effettuare un prestito"
+    );
+}
+
+void CommandsUtils::helpCommand(TgBot::Bot* bot, int64_t id) {
+    
+}
+
+
+void CommandsUtils::cantHelp(TgBot::Bot* bot, int64_t id) {
+    bot->getApi().sendMessage(
+        id,
+        "📛 Invio Fallito \
+        \n\n🤖 Avvia il bot in privato per ricevere questo messaggio"
     );
 }

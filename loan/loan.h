@@ -14,8 +14,14 @@ private:
 
     std::string date;
 
+    int id;
+
+    std::string receiverUsr;
+
 public:
     Loan(uint64_t dID, uint64_t rID, int coins, std::string date);
+
+    Loan(int id, int coins, std::string receiverUsr);
 
     uint64_t getDonatorID();
 
@@ -23,6 +29,10 @@ public:
 
     int getCoins();
 
+    int getId();
+
+    std::string getRecUsr();
+    
     std::string getDate();
 };
 

@@ -57,6 +57,10 @@ private:
 
     void historyBets();
 
+    void historyLoans();
+
+    void help();
+    
     void callBackQuery();
 
 public:

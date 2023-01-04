@@ -82,12 +82,20 @@ public:
 
     static void historyBets(TgBot::Bot* bot, int64_t chatID, const std::string& date, std::vector<Bet>& bets, std::string username);
 
+    static void historyLoans(TgBot::Bot* bot, int64_t chatID, const std::string& date, std::vector<Loan>& loans, std::string username);
+
     static void noBets(TgBot::Bot* bot, int64_t chatID, std::string& date, bool anotherUser, const std::string& username);
+
+    static void noLoans(TgBot::Bot* bot, int64_t chatID, std::string& date, bool anotherUser, const std::string& username);
 
     static void printCopyRights(TgBot::Bot* bot, TgBot::CallbackQuery::Ptr query, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
     static void printStartPanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user, TgBot::InlineKeyboardMarkup::Ptr keyboard);
 
+    static void cantHelp(TgBot::Bot* bot, int64_t id);
+
+    static void helpCommand(TgBot::Bot* bot, int64_t id);
+    
     static void printStartPrivatePanel(TgBot::Bot* bot, int64_t id, TgBot::ChatMember::Ptr user);
 
     static int countArguments(const std::string command, const std::string message);

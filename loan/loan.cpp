@@ -7,11 +7,25 @@ Loan::Loan(uint64_t dID, uint64_t rID, int coins, std::string date) {
     this->date = date;
 }
 
+Loan::Loan(int id, int coins, std::string receiverUsr) {
+    this->id = id;
+    this->coins = coins;
+    this->receiverUsr = receiverUsr;
+}
+
 int Loan::getCoins() {
     return this->coins;
 }
 
-std::string Loan::getDate() {
+int Loan::getId() {
+    return this->id;
+}
+
+std::string Loan::getRecUsr() {
+    return this->receiverUsr;
+}
+
+std::string Loan::getDate()  {
     return this->date;
 }
 

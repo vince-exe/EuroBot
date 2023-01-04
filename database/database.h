@@ -82,7 +82,7 @@ public:
     /**
      * @brief checks if a user exist in the database
      * 
-     * @param id user identifier for the exist condition
+     * @param id user unique identifier
      * 
      * @param sqlErr a pointer to struct used when an error is present
      * 
@@ -93,6 +93,15 @@ public:
     static bool existUser(User* user, DBErrors::SqlErrors* sqlErr);
 
     /**
+     * @brief checks if a user exist in the database
+     * 
+     * @param id user unique identifier
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     */
+    static bool existUser(int64_t id, DBErrors::SqlErrors* sqlErr);
+
+    /** 
      * @brief insert a user in the database
      * 
      * @param user the user to insert
@@ -121,7 +130,7 @@ public:
     static bool insertBet(int64_t userId, Bet bet, DBErrors::SqlErrors* sqlErr);
 
     /**
-     * @brief get the bets on the given date
+     * @brief get the bets on the given date of the user
      * 
      * @param userId user unique identifier
      *
@@ -131,6 +140,17 @@ public:
      *
      */
     static std::vector<Bet> getBetsOn(int64_t userId, const std::string& date, DBErrors::SqlErrors* sqlErr);
+    
+    /**
+     * @brief get the loans on the guven date of the user
+     * 
+     * @param donatorId donator unique identifier
+     * 
+     * @param date the date of the loans
+     * 
+     * @param sqlErr a pointer to struct used when an error is present
+     */
+    static std::vector<Loan> getLoansOn(int64_t donatorId, const std::string& date, DBErrors::SqlErrors* sqlErr);
     
     /**
      * @brief return a User istance

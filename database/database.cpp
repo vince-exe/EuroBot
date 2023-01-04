@@ -72,7 +72,30 @@ bool Database::existUser(User* user, DBErrors::SqlErrors* sqlErr) {
         sqlErr->errCode = e.getErrorCode();
         sqlErr->sqlState = e.getSQLState();
         sqlErr->error = true;
+
+        return false;
     }  
+}
+
+bool Database::existUser(int64_t id, DBErrors::SqlErrors* sqlErr) {
+    try {
+        sqlErr->error = false;
+        Database::pstmt = Database::con->prepareStatement(
+            "SELECT ID FROM users WHERE users.ID = ?;"
+        );  
+        Database::pstmt->setString(1, std::to_string(id));
+        Database::res = Database::pstmt->executeQuery();
+
+        return (Database::res->rowsCount()) ? true : false;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        sqlErr->error = true;
+
+        return false;
+    } 
 }
 
 bool Database::insertUser(User* user, DBErrors::SqlErrors* sqlErr) {
@@ -135,6 +158,31 @@ std::vector<Bet> Database::getBetsOn(int64_t userId, const std::string& date, DB
             betVec.push_back(Bet(res->getInt(1), res->getInt(2), res->getInt(3), res->getString("date_")));
         }
         return betVec;
+    }
+    catch(sql::SQLException &e) {
+        sqlErr->what = e.what();
+        sqlErr->errCode = e.getErrorCode();
+        sqlErr->sqlState = e.getSQLState();
+        sqlErr->error = true;
+
+        return {};
+    }
+}
+
+std::vector<Loan> Database::getLoansOn(int64_t donatorId, const std::string& date, DBErrors::SqlErrors* sqlErr) {
+    std::vector<Loan> loanVec;
+    try {
+        Database::pstmt = Database::con->prepareStatement(
+            "   ;"
+        );
+        Database::pstmt->setString(1, std::to_string(donatorId));
+        Database::pstmt->setDateTime(2, date);
+
+        Database::res = Database::pstmt->executeQuery();
+        while(res->next()) {
+            loanVec.push_back(Loan(res->getInt(1), res->getInt(2), res->getString("username")));
+        }
+        return loanVec;
     }
     catch(sql::SQLException &e) {
         sqlErr->what = e.what();

@@ -78,12 +78,14 @@ void BotCommands::init() {
     this->stats();
     this->list();
     this->historyBets();
+    this->historyLoans();
     this->callBackQuery();
-}
+}   
 
 void BotCommands::start() {
     this->eventBroadCaster->onCommand("start", [this](TgBot::Message::Ptr message) {
         TgBot::ChatMember::Ptr user = this->bot->getApi().getChatMember(message->chat->id, message->from->id);
+        if(user->user->isBot || !user) { return; }
 
         CommandsUtils::lastCommand = "start";
         
@@ -171,6 +173,8 @@ void BotCommands::stake() {
             return;
         }
 
+        if(message->chat->type == TgBot::Chat::Type::Private) { return; }
+
         DBErrors::SqlErrors sqlErr;
         int value;
         int maxBets = AdminSettings::dailyBets();
@@ -185,10 +189,7 @@ void BotCommands::stake() {
         
         User user = Database::getUser(message->from->id, &sqlErr);
         if(user.getId() == -1) {
-            CommandsUtils::fatalError(this->bot, message->chat->id);
-            BotUtils::printFatalErrorDB(&sqlErr);
-                
-            exit(EXIT_FAILURE);
+            return;
         }
         
         if(value > user.getCoins() || value <= 0) {
@@ -356,6 +357,60 @@ void BotCommands::historyBets() {
         }
         else {   
             CommandsUtils::historyBets(this->bot, message->from->id, date, betVec, username);
+        }
+    });
+}
+
+void BotCommands::historyLoans() {
+    this->bot->getEvents().onCommand("cronPrestiti", [this](TgBot::Message::Ptr message) {
+        if(this->bot->getApi().blockedByUser(message->from->id)) { return; }
+        
+        int args = CommandsUtils::countArguments("/cronPrestiti", message->text);
+        if(args == 0 && args >= 3) { return; }
+
+        DBErrors::SqlErrors sqlErr;
+        std::string username;
+        std::string date;
+
+        if(args == 2) {
+            username = CommandsUtils::getArguments("/cronPrestiti", message->text)[0];
+            if(username[0] != '@') { return; }
+
+            username.erase(0, 1);
+            date = CommandsUtils::getArguments("/cronPrestiti", message->text)[1];
+        }
+        else {
+            username = message->from->username;
+            date = CommandsUtils::getArguments("/cronPrestiti", message->text)[0];
+        }
+
+        User user = Database::getUser(username, &sqlErr);
+        if(user.getId() == -1) { return; }
+        
+        struct tm tm{};
+
+        if(date == "oggi") {
+            date = BotUtils::currentDateTime("%Y-%m-%d");
+        }
+        else if(!strptime(date.c_str(), "%Y-%m-%d", &tm)) { 
+            return;
+        }
+
+        std::vector<Loan> loanVec = Database::getLoansOn(user.getId(), date, &sqlErr);
+        if(loanVec.empty()) {
+            CommandsUtils::noLoans(this->bot, message->from->id, date, (args == 2), username);
+        }
+        else {   
+            CommandsUtils::historyLoans(this->bot, message->from->id, date, loanVec, username);
+        }
+    });
+}
+
+void BotCommands::help() {
+    this->bot->getEvents().onCommand("help", [this](TgBot::Message::Ptr message) {
+    
+        if(this->bot->getApi().blockedByUser(message->from->id)) {
+            
         }
     });
 }
