@@ -529,9 +529,23 @@ void CommandsUtils::noLoans(TgBot::Bot* bot, int64_t chatID, std::string& date, 
 }
 
 void CommandsUtils::helpCommand(TgBot::Bot* bot, int64_t id) {
-    
+    bot->getApi().sendMessage(
+        id,
+        "<b>📬 Lista Comandi</b> \
+        \n\n❄️ <b>/join</b> ti fa entrare in partita \
+        \n\n🌐 <b>/infoGame</b> ti restituisce le impostazioni che l'admin ha usato per la partita \
+        \n\n❄️ <b>/punta</b> \{soldi\} ti fa scommettere i soldi desiderati \
+        \n\n🌐 <b>/presta</b> \{@utente\} \{soldi\} ti fa prestare i soldi desiderati \
+        \n\n❄️ <b>/stats</b> \{@utente\} ti mostra le tue statistiche o quelle di un'utente se inserito nel comando \
+        \n\n🌐 <b>/classifica</b> ti mostra la top 3 giocatori con più soldi della partita \
+        \n\n❄️ <b>/cronScommesse</b> \{@utente\} \{data\} ti mostra la tua cronologia scommesse oppure quella di un utente se inserito nel comando \
+        \n\n🌐 <b>/cronPrestiti</b> \{@utente\} \{data\} ti mostra la tua cronologia prestiti oppure quella di un utente se inserito nel comando \
+        \n\n📝 <i>la data deve essere nel seguente formato \{ Anno / Mese / Giorno \} oppure puoi usare \{oggi\}</i> \
+        \n\n⛔ <i>I comandi /cronScommesse /cronPrestiti /infoGame richiedono che tu abbia avviato il bot in privato</i> \
+        \n\n⛑️ <i>Per ottenere maggiori informazioni puoi rivolgerti allo staff di @scommesse_bot</i>",
+        false, 0, std::make_shared<TgBot::GenericReply>(), "HTML"
+    );
 }
-
 
 void CommandsUtils::cantHelp(TgBot::Bot* bot, int64_t id) {
     bot->getApi().sendMessage(

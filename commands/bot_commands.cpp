@@ -79,6 +79,7 @@ void BotCommands::init() {
     this->list();
     this->historyBets();
     this->historyLoans();
+    this->help();
     this->callBackQuery();
 }   
 
@@ -408,10 +409,11 @@ void BotCommands::historyLoans() {
 
 void BotCommands::help() {
     this->bot->getEvents().onCommand("help", [this](TgBot::Message::Ptr message) {
-    
         if(this->bot->getApi().blockedByUser(message->from->id)) {
-            
-        }
+            CommandsUtils::cantHelp(this->bot, message->chat->id);
+            return;
+        }   
+        CommandsUtils::helpCommand(this->bot, message->from->id);
     });
 }
 
